@@ -1,4 +1,4 @@
-package de.enwaffel.randomutils.utils;
+package de.enwaffel.randomutils.utils.file;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
@@ -9,7 +9,6 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 
 public class FileUtil {
-
 
     // read
     public static String readFile(@NotNull FileOrPath fileOrPath, int maxBytes) {
@@ -35,7 +34,6 @@ public class FileUtil {
     }
 
     // json
-
     public static JSONObject readJSON(@NotNull FileOrPath fileOrPath) {
         return new JSONObject(readFile(fileOrPath));
     }
@@ -45,7 +43,6 @@ public class FileUtil {
     }
 
     // write
-
     public static void writeFile(@NotNull Object o, @NotNull FileOrPath fileOrPath) {
         try {
             FileOutputStream fos = new FileOutputStream(fileOrPath.getFile());
