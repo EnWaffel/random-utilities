@@ -1,6 +1,6 @@
-package de.enwaffel.randomutils.utils;
+package de.enwaffel.randomutils;
 
-import de.enwaffel.randomutils.utils.file.FileOrPath;
+import de.enwaffel.randomutils.file.FileOrPath;
 
 public class ValidateUtils {
 

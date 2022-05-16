@@ -1,4 +1,4 @@
-package de.enwaffel.randomutils.utils.file;
+package de.enwaffel.randomutils.file;
 
 import java.io.File;
 

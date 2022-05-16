@@ -1,8 +1,12 @@
-package de.enwaffel.randomutils.utils.bytebuff;
+package de.enwaffel.randomutils.bytebuff;
 
 public class ByteBuffer {
 
     private byte[] buffer;
+
+    public ByteBuffer(byte[] buffer) {
+        this.buffer = buffer;
+    }
 
     public ByteBuffer(int limit) {
         buffer = new byte[limit];
@@ -21,6 +25,10 @@ public class ByteBuffer {
 
     public void c() {
         buffer = new byte[buffer.length];
+    }
+
+    public byte[] getBuffer() {
+        return buffer;
     }
 
 }
