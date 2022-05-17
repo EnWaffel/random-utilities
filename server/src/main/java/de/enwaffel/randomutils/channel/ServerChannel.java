@@ -1,39 +1,38 @@
 package de.enwaffel.randomutils.channel;
 
-import de.enwaffel.randomutils.bytebuff.ByteBuffer;
-import de.enwaffel.randomutils.client.ClientConnection;
-import de.enwaffel.randomutils.client.ClientOutput;
+import de.enwaffel.randomutils.buff.ByteBuffer;
+import de.enwaffel.randomutils.buff.InByteBuffer;
+import de.enwaffel.randomutils.client.Connection;
 import de.enwaffel.randomutils.packet.Packet;
-import de.enwaffel.randomutils.server.Server;
 import org.json.JSONObject;
 
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.nio.charset.StandardCharsets;
 
 public class ServerChannel extends Channel {
 
-    private final Server server;
-
-    public ServerChannel(String name, Server server) {
+    public ServerChannel(String name) {
         super(name);
-        this.server = server;
     }
 
     @Override
-    public void read(ClientConnection connection, DataInputStream dis) {
-
+    public void read(Connection connection, DataInputStream dis) {
+        InByteBuffer dataBuff = new InByteBuffer(dis);
+        dataBuff.readFully();
     }
 
     @Override
-    public void write(ClientOutput output, Packet<?> packet) {
+    public void write(DataOutputStream dos, Packet<?> packet) {
         try {
             JSONObject data = new JSONObject();
             data.put("channel", getName());
             data.put("data", packet.writeable());
 
-            ByteBuffer buffer = new ByteBuffer(packet.writeable().getBytes(StandardCharsets.UTF_8));
-            output.write(buffer.getBuffer().length);
-            output.write(buffer.getBuffer());
+            ByteBuffer buffer = new ByteBuffer(data.toString().getBytes(StandardCharsets.UTF_8));
+            dos.writeUTF(name);
+            //dos.write(buffer.getBuffer().length); -- not needed for now
+            dos.write(buffer.getBuffer());
         } catch (Exception e) {
             e.printStackTrace();
         }

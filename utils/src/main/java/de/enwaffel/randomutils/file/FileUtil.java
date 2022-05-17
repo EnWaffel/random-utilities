@@ -1,6 +1,6 @@
 package de.enwaffel.randomutils.file;
 
-import de.enwaffel.randomutils.bytebuff.InByteBuffer;
+import de.enwaffel.randomutils.buff.InByteBuffer;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 

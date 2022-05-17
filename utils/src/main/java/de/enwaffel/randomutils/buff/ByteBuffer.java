@@ -1,4 +1,4 @@
-package de.enwaffel.randomutils.bytebuff;
+package de.enwaffel.randomutils.buff;
 
 public class ByteBuffer {
 
