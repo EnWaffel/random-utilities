@@ -13,12 +13,12 @@ import java.util.Map;
 
 public abstract class ClientHolder<C extends Channel> extends ChannelHolder<ServerChannel> {
 
-    private boolean running;
+    protected boolean running;
 
     private Thread acceptThread;
     private Thread dataThread;
     protected ServerSocket socket;
-    private final List<Connection> clients = new ArrayList<>();
+    protected final List<Connection> clients = new ArrayList<>();
 
     public void start() {
         acceptThread = new Thread(this::catch_clients, "Server Client Accept Thread");
@@ -30,11 +30,17 @@ public abstract class ClientHolder<C extends Channel> extends ChannelHolder<Serv
     }
 
     public void stop() {
-        acceptThread.stop();
-        dataThread.stop();
+        try {
+            acceptThread.stop();
+            dataThread.stop();
+            if (socket != null)
+                socket.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
-    public void catch_clients() {
+    private void catch_clients() {
         try {
             while (running) {
                 if (socket != null && !socket.isClosed() && socket.isBound()) {
@@ -42,6 +48,7 @@ public abstract class ClientHolder<C extends Channel> extends ChannelHolder<Serv
                     if (s != null) {
                         Connection conn = new Connection(s);
                         clients.add(conn);
+                        System.out.println(conn.s().getInetAddress());
                     }
                 }
             }
@@ -59,7 +66,7 @@ public abstract class ClientHolder<C extends Channel> extends ChannelHolder<Serv
                         if (conn != null && !conn.s().isClosed() && conn.s().isConnected()) {
                             DataInputStream dis = new DataInputStream(conn.input());
                             String str = dis.readUTF();
-                            if (!str.isEmpty() && !str.isBlank()) {
+                            if (!str.isEmpty()) {
                                 for (Map.Entry<String, ServerChannel> set : channels.entrySet()) {
                                     ServerChannel channel = set.getValue();
                                     if (channel != null && channel.getName().equals(str)) {

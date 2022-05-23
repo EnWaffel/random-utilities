@@ -1,5 +1,7 @@
 package de.enwaffel.randomutils.buff;
 
+import java.util.Arrays;
+
 public class ByteBuffer {
 
     private byte[] buffer;

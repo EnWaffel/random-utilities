@@ -4,18 +4,18 @@ import de.enwaffel.randomutils.buff.InByteBuffer;
 import de.enwaffel.randomutils.client.Connection;
 
 import java.io.DataInputStream;
+import java.util.Arrays;
 
-public class ServerChannel extends Channel {
+public class ClientChannel extends Channel {
 
-    public ServerChannel(String name) {
+    public ClientChannel(String name) {
         super(name);
     }
 
     @Override
     public void read(Connection connection, DataInputStream dis) {
         InByteBuffer dataBuff = new InByteBuffer(dis);
-        dataBuff.readFully();
-        System.out.println(new String(dataBuff.getBuffer()));
+        System.out.println(Arrays.toString(dataBuff.readFully())+ "AA");
     }
 
 }

@@ -1,7 +1,6 @@
 package de.enwaffel.randomutils.file;
 
 import de.enwaffel.randomutils.buff.InByteBuffer;
-import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 
 import java.io.FileInputStream;
@@ -12,7 +11,7 @@ import java.nio.file.Files;
 public class FileUtil {
 
     // read
-    public static String readFile(@NotNull FileOrPath fileOrPath, int maxBytes) {
+    public static String readFile(FileOrPath fileOrPath, int maxBytes) {
         try {
             FileInputStream fis = new FileInputStream(fileOrPath.getFile());
             byte[] buffer = new byte[maxBytes];
@@ -25,7 +24,7 @@ public class FileUtil {
         }
     }
 
-    public static String e(@NotNull FileOrPath fileOrPath) {
+    public static String e(FileOrPath fileOrPath) {
         try {
             FileInputStream fis = new FileInputStream(fileOrPath.getFile());
             InByteBuffer b = new InByteBuffer(fis);
@@ -39,7 +38,7 @@ public class FileUtil {
         }
     }
 
-    public static String readFile(@NotNull FileOrPath fileOrPath) {
+    public static String readFile(FileOrPath fileOrPath) {
         try {
             return new String(Files.readAllBytes(fileOrPath.getFile().toPath()));
         } catch (Exception e) {
@@ -49,16 +48,16 @@ public class FileUtil {
     }
 
     // json
-    public static JSONObject readJSON(@NotNull FileOrPath fileOrPath) {
+    public static JSONObject readJSON( FileOrPath fileOrPath) {
         return new JSONObject(readFile(fileOrPath));
     }
 
-    public static JSONObject readJSON(@NotNull FileOrPath fileOrPath, int buffer) {
+    public static JSONObject readJSON(FileOrPath fileOrPath, int buffer) {
         return new JSONObject(readFile(fileOrPath, buffer));
     }
 
     // write
-    public static void writeFile(@NotNull Object o, @NotNull FileOrPath fileOrPath) {
+    public static void writeFile(Object o, FileOrPath fileOrPath) {
         try {
             FileOutputStream fos = new FileOutputStream(fileOrPath.getFile());
             for (char c : o.toString().toCharArray()) {
@@ -71,7 +70,7 @@ public class FileUtil {
         }
     }
 
-    public static void writeFile(@NotNull Object o, @NotNull FileOrPath fileOrPath, @NotNull OutputStream os) {
+    public static void writeFile(Object o, FileOrPath fileOrPath, OutputStream os) {
         try {
             if (!(os instanceof FileOutputStream))
                 throw new IllegalAccessException("OutputStream must be a FileOutputStream!");

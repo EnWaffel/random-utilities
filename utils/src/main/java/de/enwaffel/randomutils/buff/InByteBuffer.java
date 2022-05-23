@@ -21,19 +21,18 @@ public class InByteBuffer extends ByteBuffer {
         this.is = is;
     }
 
-    public void readFully() {
+    public byte[] readFully() {
         try {
             while (true) {
                 int b = is.read();
-                if (b != -1) {
+                System.out.println(new String(getBuffer()));
+
                     a((byte) b);
-                } else {
-                    break;
-                }
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return new byte[]{};
     }
 
     public byte readNext() {
