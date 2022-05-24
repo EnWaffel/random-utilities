@@ -1,6 +1,5 @@
 package de.enwaffel.randomutils.file;
 
-import de.enwaffel.randomutils.buff.InByteBuffer;
 import org.json.JSONObject;
 
 import java.io.FileInputStream;
@@ -18,20 +17,6 @@ public class FileUtil {
             while (fis.read(buffer, 0, maxBytes) >= 0);
             fis.close();
             return new String(buffer);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "";
-        }
-    }
-
-    public static String e(FileOrPath fileOrPath) {
-        try {
-            FileInputStream fis = new FileInputStream(fileOrPath.getFile());
-            InByteBuffer b = new InByteBuffer(fis);
-            b.readFully();
-            System.out.println(new String(b.getBuffer()));
-            fis.close();
-            return new String("");
         } catch (Exception e) {
             e.printStackTrace();
             return "";
