@@ -62,7 +62,7 @@ public class Client extends ChannelHolder<ClientChannel> {
                     if (!socket.isClosed() && socket.isConnected()) {
                         DataInputStream dis = new DataInputStream(c().input());
                         String str = dis.readUTF();
-                        if (!str.isEmpty() && !str.isBlank()) {
+                        if (!str.isEmpty()) {
                             for (Map.Entry<String, ClientChannel> set : channels.entrySet()) {
                                 ClientChannel channel = set.getValue();
                                 if (channel != null && channel.getName().equals(str)) {
