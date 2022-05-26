@@ -25,9 +25,9 @@ public class InByteBuffer extends ByteBuffer {
         try {
             while (true) {
                 int b = is.read();
-                System.out.println(new String(getBuffer()));
-
-                    a((byte) b);
+                a((byte) b);
+                if (b < 0)
+                    break;
             }
         } catch (Exception e) {
             e.printStackTrace();

@@ -2,6 +2,7 @@ package de.enwaffel.randomutils.file;
 
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
@@ -42,6 +43,11 @@ public class FileUtil {
     }
 
     // write
+    public static void writeFileIf(Object o, FileOrPath fileOrPath, boolean _if) {
+        if (_if)
+            writeFile(o, fileOrPath);
+    }
+
     public static void writeFile(Object o, FileOrPath fileOrPath) {
         try {
             FileOutputStream fos = new FileOutputStream(fileOrPath.getFile());
