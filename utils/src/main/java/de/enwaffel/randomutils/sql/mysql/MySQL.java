@@ -1,19 +1,24 @@
 package de.enwaffel.randomutils.sql.mysql;
 
+import de.enwaffel.randomutils.sql.PullEntries;
+import de.enwaffel.randomutils.sql.SQL;
+import de.enwaffel.randomutils.sql.SQLDriver;
+import de.enwaffel.randomutils.sql.SQLEntry;
+
 import java.sql.*;
 import java.util.Collection;
 
-public class MySQL {
+public class MySQL extends SQL {
 
     private final Connection connection;
 
-    public MySQL(String address, String db, String un, String pw) throws ClassNotFoundException, SQLException {
-        String driver = "com.mysql.jdbc.Driver";
+    protected MySQL(SQLDriver driver, String address, String db, String un, String pw) throws SQLException {
+        super(driver);
         String url = "jdbc:mysql://" + address + "/" + db;
-        Class.forName(driver);
         connection = DriverManager.getConnection(url, un, pw);
     }
 
+    @Override
     public boolean push(String table, SQLEntry entry) {
         try {
             Collection<String> labels = entry.getEntries().keySet();
@@ -44,7 +49,6 @@ public class MySQL {
             }
             args.append(");");
 
-
             PreparedStatement post = connection.prepareStatement(args.toString());
             post.executeUpdate();
             return true;
@@ -54,6 +58,7 @@ public class MySQL {
         return false;
     }
 
+    @Override
     public boolean commit(String table, SQLEntry entry, String anyLabel, Object anyValue) {
         try {
             Collection<String> labels = entry.getEntries().keySet();
@@ -85,12 +90,10 @@ public class MySQL {
         return false;
     }
 
+    @Override
     public boolean has(String table, String label, Object value) {
         try {
             String v = value.toString();
-            if (value.getClass().equals(String.class)) {
-                v = "\"" + value + "\"";
-            }
             PreparedStatement statement = connection.prepareStatement("SELECT '" + label + "' FROM " + table + " WHERE " + label + " = '" + v + "';");
             ResultSet result = statement.executeQuery();
             int i = 0;
@@ -105,6 +108,7 @@ public class MySQL {
         }
     }
 
+    @Override
     public SQLEntry pull(String table, PullEntries entries, String[] anyLabels, Object... anyValues) {
         try {
             SQLEntry entry = new SQLEntry();

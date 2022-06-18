@@ -1,4 +1,4 @@
-package de.enwaffel.randomutils.sql.mysql;
+package de.enwaffel.randomutils.sql;
 
 import java.util.HashMap;
 
