@@ -1,5 +1,6 @@
 package de.enwaffel.randomutils.file;
 
+import de.enwaffel.randomutils.Condition;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -34,7 +35,7 @@ public class FileUtil {
     }
 
     // json
-    public static JSONObject readJSON( FileOrPath fileOrPath) {
+    public static JSONObject readJSON(FileOrPath fileOrPath) {
         return new JSONObject(readFile(fileOrPath));
     }
 
@@ -44,8 +45,11 @@ public class FileUtil {
 
     // write
     public static void writeFileIf(Object o, FileOrPath fileOrPath, boolean _if) {
-        if (_if)
-            writeFile(o, fileOrPath);
+        if (_if) writeFile(o, fileOrPath);
+    }
+
+    public static void writeFileIf(Object o, FileOrPath fileOrPath, Condition... conditions) {
+        if (Condition.met(conditions, fileOrPath)) writeFile(o, fileOrPath);
     }
 
     public static void writeFile(Object o, FileOrPath fileOrPath) {
@@ -61,7 +65,7 @@ public class FileUtil {
         }
     }
 
-    public static void writeFile(Object o, FileOrPath fileOrPath, OutputStream os) {
+    public static void writeFile(Object o, OutputStream os) {
         try {
             if (!(os instanceof FileOutputStream))
                 throw new IllegalAccessException("OutputStream must be a FileOutputStream!");
@@ -73,6 +77,24 @@ public class FileUtil {
             fos.close();
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    public static FileOutputStream getOutputStream(FileOrPath fileOrPath) {
+        try {
+            return new FileOutputStream(fileOrPath.getFile());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static FileInputStream getInputStream(FileOrPath fileOrPath) {
+        try {
+            return new FileInputStream(fileOrPath.getFile());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
         }
     }
 

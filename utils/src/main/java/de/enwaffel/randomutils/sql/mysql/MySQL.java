@@ -8,6 +8,9 @@ import de.enwaffel.randomutils.sql.SQLEntry;
 import java.sql.*;
 import java.util.Collection;
 
+/**
+ * Parameters: driver : {@link SQLDriver}, address : {@link String}, database : {@link String}, username : {@link String}, password : {@link String}
+ */
 public class MySQL extends SQL {
 
     private final Connection connection;
