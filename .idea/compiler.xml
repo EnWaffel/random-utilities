@@ -12,7 +12,6 @@
     <bytecodeTargetLevel>
       <module name="graphic" target="14" />
       <module name="server" target="11" />
-      <module name="utils" target="14" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">

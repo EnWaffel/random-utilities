@@ -11,6 +11,11 @@ public class Properties {
         return this;
     }
 
+    public Properties set(String key, Object value) {
+        properties.put(key, new Property(value));
+        return this;
+    }
+
     public Property get(String key) {
         return properties.getOrDefault(key, new Property(null));
     }

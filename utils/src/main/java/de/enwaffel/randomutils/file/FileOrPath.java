@@ -7,24 +7,28 @@ public class FileOrPath {
     private String path;
     private File file;
 
-    public FileOrPath(String path) {
+    private FileOrPath(String path) {
         this.path = path;
     }
 
-    public FileOrPath(File file) {
+    private FileOrPath(File file) {
         this.file = file;
     }
 
     public String getPath() {
-        return path;
+        return path != null ? path : file.getPath();
     }
 
     public File getFile() {
-        if (path == null) {
-            return file;
-        } else {
-            return new File(path);
-        }
+        return file != null ? file : new File(path);
+    }
+
+    public static FileOrPath file(File file) {
+        return new FileOrPath(file);
+    }
+
+    public static FileOrPath path(String path) {
+        return new FileOrPath(path);
     }
 
 }

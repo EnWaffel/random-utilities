@@ -1,0 +1,13 @@
+{
+    "name": "java-natives",
+    "version": "0.0.1",
+    "exclude": [
+        "j.lua",
+        "byte.lua",
+        "stream.lua"
+    ],
+    "native-libraries": [
+        "lua_lib__stream"
+    ],
+    "class-path": "de.enwaffel.lib.java_natives.main"
+}

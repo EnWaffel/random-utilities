@@ -5,7 +5,6 @@
       <element id="module-output" name="utils" />
       <element id="library" level="project" name="json" />
       <element id="library" level="project" name="jetbrains.annotations" />
-      <element id="library" level="project" name="Maven: org.jetbrains:annotations-java5:23.0.0" />
       <element id="module-output" name="server" />
     </root>
   </artifact>

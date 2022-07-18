@@ -28,6 +28,14 @@ public class Property {
         return value;
     }
 
+    public <T> T any() {
+        return (T) value;
+    }
+
+    public boolean isNull() {
+        return value == null;
+    }
+
     public void setValue(Object value) {
         this.value = value;
     }

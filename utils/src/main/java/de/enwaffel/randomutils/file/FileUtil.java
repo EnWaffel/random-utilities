@@ -98,4 +98,20 @@ public class FileUtil {
         }
     }
 
+    public static String getExtension(File file) {
+        String extension = "";
+
+        int index = file.getName().lastIndexOf('.');
+        if (index > 0) {
+            extension = file.getName().substring(index + 1);
+        }
+
+        return extension;
+    }
+
+    public static String getCleanName(File file) {
+        String extension = file.getName().replaceAll(getExtension(file), "");
+        return extension.length() > 1 ? extension.substring(0, extension.length() - 1) : extension;
+    }
+
 }

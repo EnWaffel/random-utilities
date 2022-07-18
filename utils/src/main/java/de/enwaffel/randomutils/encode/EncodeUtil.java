@@ -3,21 +3,19 @@ package de.enwaffel.randomutils.encode;
 public class EncodeUtil {
 
     private static final String defaultSeparator = "-";
-    private static final EncoderMap defaultMap = new EncoderMap();
+    private static final EncoderMap defaultMap = EncoderMap.generateMap(EncoderMap.defaultSeed, EncoderMap.defaultChars);
 
-    public String to(String str) {
+    public static String to(String str) {
         StringBuilder result = new StringBuilder();
-        int i = 0;
         for (char c : str.toCharArray()) {
             result.append(defaultSeparator);
-            result.append(defaultMap.getReplacementCharacter(c));
+            result.append(defaultMap.getReplacementValue(c));
             result.append(defaultSeparator);
-            i++;
         }
         return result.toString();
     }
 
-    public String from(String str) {
+    public static String from(String str) {
         StringBuilder result = new StringBuilder();
         String[] decode = str.split(defaultSeparator);
         for (String str1 : decode) {
@@ -28,19 +26,17 @@ public class EncodeUtil {
         return result.toString();
     }
 
-    public String to(String str, String separator) {
+    public static String to(String str, String separator) {
         StringBuilder result = new StringBuilder();
-        int i = 0;
         for (char c : str.toCharArray()) {
             result.append(separator);
-            result.append(defaultMap.getReplacementCharacter(c));
+            result.append(defaultMap.getReplacementValue(c));
             result.append(separator);
-            i++;
         }
         return result.toString();
     }
 
-    public String from(String str, String separator) {
+    public static String from(String str, String separator) {
         StringBuilder result = new StringBuilder();
         String[] decode = str.split(separator);
         for (String str1 : decode) {
@@ -51,19 +47,17 @@ public class EncodeUtil {
         return result.toString();
     }
 
-    public String to(String str, String separator, EncoderMap map) {
+    public static String to(String str, String separator, EncoderMap map) {
         StringBuilder result = new StringBuilder();
-        int i = 0;
         for (char c : str.toCharArray()) {
             result.append(separator);
-            result.append(map.getReplacementCharacter(c));
+            result.append(map.getReplacementValue(c));
             result.append(separator);
-            i++;
         }
         return result.toString();
     }
 
-    public String from(String str, String separator, EncoderMap map) {
+    public static String from(String str, String separator, EncoderMap map) {
         StringBuilder result = new StringBuilder();
         String[] decode = str.split(separator);
         for (String str1 : decode) {
@@ -74,19 +68,17 @@ public class EncodeUtil {
         return result.toString();
     }
 
-    public String to(String str, EncoderMap map) {
+    public static String to(String str, EncoderMap map) {
         StringBuilder result = new StringBuilder();
-        int i = 0;
         for (char c : str.toCharArray()) {
             result.append(defaultSeparator);
-            result.append(map.getReplacementCharacter(c));
+            result.append(map.getReplacementValue(c));
             result.append(defaultMap);
-            i++;
         }
         return result.toString();
     }
 
-    public String from(String str, EncoderMap map) {
+    public static String from(String str, EncoderMap map) {
         StringBuilder result = new StringBuilder();
         String[] decode = str.split(defaultSeparator);
         for (String str1 : decode) {
@@ -95,6 +87,62 @@ public class EncodeUtil {
                 result.append(c);
         }
         return result.toString();
+    }
+
+    public static String to(String str, int times) {
+        String result = str;
+        for (int i = 0;i < times;i++) {
+            result = to(result);
+        }
+        return result;
+    }
+
+    public static String to(String str, String separator, EncoderMap map, int times) {
+        String result = str;
+        for (int i = 0;i < times;i++) {
+            result = to(result, separator, map);
+        }
+        return result;
+    }
+
+    public static String to(String str, String separator, int times) {
+        String result = str;
+        for (int i = 0;i < times;i++) {
+            result = to(result, separator);
+        }
+        return result;
+    }
+
+    public static String from(String str, String separator, EncoderMap map, int times) {
+        String result = str;
+        for (int i = 0;i < times;i++) {
+            result = from(result, separator, map);
+        }
+        return result;
+    }
+
+    public static String from(String str, String separator, int times) {
+        String result = str;
+        for (int i = 0;i < times;i++) {
+            result = from(result, separator);
+        }
+        return result;
+    }
+
+    public static String from(String str, EncoderMap map, int times) {
+        String result = str;
+        for (int i = 0;i < times;i++) {
+            result = from(result, map);
+        }
+        return result;
+    }
+
+    public static String from(String str, int times) {
+        String result = str;
+        for (int i = 0;i < times;i++) {
+            result = from(result);
+        }
+        return result;
     }
 
 }
