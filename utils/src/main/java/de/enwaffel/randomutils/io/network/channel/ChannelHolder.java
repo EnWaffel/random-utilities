@@ -41,7 +41,7 @@ public class ChannelHolder {
                 InByteBuffer buffer = c.getInputBuffer();
                 buffer.clear(false);
                 byte[] bytes = buffer.read();
-                System.out.println(new String(bytes));
+                //System.out.println(new String(bytes));
             }
 
             @Override
