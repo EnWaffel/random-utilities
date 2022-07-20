@@ -3,7 +3,6 @@ package de.enwaffel.randomutils.io;
 import de.enwaffel.randomutils.ByteUtil;
 
 import java.io.OutputStream;
-import java.util.Arrays;
 
 public class OutByteBuffer extends ByteBuffer {
 
@@ -36,7 +35,10 @@ public class OutByteBuffer extends ByteBuffer {
         return this;
     }
 
-    public void writeToOutput() {
+    /**
+     * Writes the buffered data to the OutputStream.
+     */
+    public void complete() {
         try {
             os.write(0x01); // write SOH byte (start of heading)
             os.write(0x30);
