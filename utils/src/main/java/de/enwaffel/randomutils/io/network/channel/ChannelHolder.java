@@ -4,6 +4,7 @@ import de.enwaffel.randomutils.io.InByteBuffer;
 import de.enwaffel.randomutils.io.OutByteBuffer;
 import de.enwaffel.randomutils.io.network.Connection;
 import de.enwaffel.randomutils.io.network.Writable;
+import de.enwaffel.randomutils.io.network.packet.Packet;
 import de.enwaffel.randomutils.io.network.packet.PacketDecoder;
 import org.json.JSONObject;
 
@@ -11,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class ChannelHolder {
+public abstract class ChannelHolder {
 
     private final List<String> defaultChannels = new ArrayList<>();
 
@@ -20,6 +21,7 @@ public class ChannelHolder {
 
     public ChannelHolder() {
         defaultChannels.add("default");
+        createChannel("default");
     }
 
     public void createChannel(String name) {
@@ -37,7 +39,7 @@ public class ChannelHolder {
             }
 
             @Override
-            public void read(Connection c, PacketDecoder d) {
+            public void read(Connection c, PacketDecoder<? extends Packet<?>> d) {
                 InByteBuffer buffer = c.getInputBuffer();
                 buffer.clear(false);
                 byte[] bytes = buffer.read();
@@ -68,6 +70,17 @@ public class ChannelHolder {
             if (channel.getIdentifier().getName().equals(name)) return true;
         }
         return false;
+    }
+
+    public void removeChannel(String name) {
+        if (defaultChannels.contains(name.toLowerCase())) throw new IllegalStateException("Channel cannot be removed!");
+        Channel toRemove = null;
+        for (Channel channel : channels) {
+            if (channel.getIdentifier().getName().equals(name)) {
+                toRemove = channel;
+            }
+        }
+        if (toRemove != null) channels.remove(toRemove);
     }
 
 }
