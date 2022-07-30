@@ -25,4 +25,8 @@ public class Properties {
         return this;
     }
 
+    public HashMap<String, Property> list() {
+        return properties;
+    }
+
 }

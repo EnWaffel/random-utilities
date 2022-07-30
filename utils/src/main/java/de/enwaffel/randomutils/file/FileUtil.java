@@ -1,6 +1,7 @@
 package de.enwaffel.randomutils.file;
 
 import de.enwaffel.randomutils.Condition;
+import de.enwaffel.randomutils.io.ByteBuffer;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -55,8 +56,12 @@ public class FileUtil {
     public static void writeFile(Object o, FileOrPath fileOrPath) {
         try {
             FileOutputStream fos = new FileOutputStream(fileOrPath.getFile());
-            for (char c : o.toString().toCharArray()) {
-                fos.write(c);
+            if (o instanceof ByteBuffer) {
+                fos.write(((ByteBuffer) o).getBuffer());
+            } else {
+                for (char c : o.toString().toCharArray()) {
+                    fos.write(c);
+                }
             }
             fos.flush();
             fos.close();

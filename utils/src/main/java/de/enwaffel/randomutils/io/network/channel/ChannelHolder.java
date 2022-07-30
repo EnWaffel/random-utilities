@@ -16,7 +16,6 @@ public abstract class ChannelHolder {
 
     private final List<String> defaultChannels = new ArrayList<>();
 
-
     private final List<Channel> channels = new ArrayList<>();
 
     public ChannelHolder() {
