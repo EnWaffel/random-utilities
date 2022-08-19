@@ -5,9 +5,6 @@
     <option name="originalFiles">
       <list>
         <option value="$PROJECT_DIR$/utils/pom.xml" />
-        <option value="$PROJECT_DIR$/gml/pom.xml" />
-        <option value="$PROJECT_DIR$/luagml/pom.xml" />
-        <option value="$PROJECT_DIR$/lua__java_natives/pom.xml" />
       </list>
     </option>
     <option name="ignoredFiles">
