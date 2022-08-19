@@ -3,7 +3,7 @@
     "version": "0.0.1",
     "exclude": [
         "j.lua",
-        "byte.lua",
+        "bytes.lua",
         "stream.lua"
     ],
     "native-libraries": [

@@ -1,8 +1,13 @@
 package de.enwaffel.randomutils.file;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 public class FileOrPath {
+
+    private static int scannedFolders;
+    private static int foundFiles;
 
     private String path;
     private File file;
@@ -29,6 +34,42 @@ public class FileOrPath {
 
     public static FileOrPath path(String path) {
         return new FileOrPath(path);
+    }
+
+    public static FileOrPath search(FileOrPath folder, String name) {
+        return FileOrPath.path(findPath(folder.getFile(), name));
+    }
+
+    private static String findPath(File startFolder, String name) {
+        List<File> files = list_all_files(startFolder);
+        for (File f : files) {
+            if (f.getName().equals(name)) {
+                return f.getPath();
+            }
+        }
+        return "";
+    }
+
+    private static List<File> list_all_files(File folder) {
+        List<File> files = new ArrayList<>();
+        File[] listedFiles = folder.listFiles();
+        if (listedFiles != null) {
+            scannedFolders++;
+            for (File f : listedFiles) {
+                if (f.isDirectory()) {
+                    files.addAll(list_all_files(f));
+                }
+                files.add(f);
+                foundFiles++;
+            }
+        }
+        System.out.println(scannedFolders + " | " + foundFiles);
+        return files;
+    }
+
+    @Override
+    public String toString() {
+        return getPath();
     }
 
 }

@@ -59,13 +59,13 @@ public abstract class SQL {
      * @param parameters The required parameters for the sql type
      * @return A new SQL object connected to the provided address. Or null if the connection-process failed.
      */
-    public SQL connect(Class<? extends SQL> t, Object... parameters) {
+    public static <T extends SQL> T connect(Class<? extends SQL> t, Object... parameters) {
         try {
             Class<?>[] classParameters = new Class<?>[parameters.length];
             for (int i = 0;i < parameters.length;i++) {
                 classParameters[i] = parameters[i].getClass();
             }
-            return t.getDeclaredConstructor(classParameters).newInstance(parameters);
+            return (T) t.getDeclaredConstructor(classParameters).newInstance(parameters);
         } catch (Exception e) {
             e.printStackTrace();
             return null;

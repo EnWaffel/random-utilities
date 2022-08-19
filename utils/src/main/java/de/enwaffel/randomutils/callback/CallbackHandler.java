@@ -5,7 +5,7 @@ import de.enwaffel.randomutils.Properties;
 import java.util.HashMap;
 import java.util.Map;
 
-public class CallbackHandler {
+public abstract class CallbackHandler {
 
     private final HashMap<String, Callback> callbacks = new HashMap<>();
 

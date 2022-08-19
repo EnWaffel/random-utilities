@@ -22,7 +22,9 @@ public class MathUtil {
         StringBuilder result = new StringBuilder();
 
         for (int i = 0;i < maxDigits;i++) {
-            result.append(digits[i]);
+            if (i < digits.length) {
+                result.append(digits[i]);
+            }
         }
         return Integer.parseInt(result.toString());
     }
@@ -38,4 +40,7 @@ public class MathUtil {
         return result;
     }
 
+    public static double percentOf(double v, double of, double p) {
+        return v * (p / of);
+    }
 }
