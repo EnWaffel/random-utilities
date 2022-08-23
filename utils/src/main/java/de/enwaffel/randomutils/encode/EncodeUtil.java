@@ -73,7 +73,7 @@ public class EncodeUtil {
         for (char c : str.toCharArray()) {
             result.append(defaultSeparator);
             result.append(map.getReplacementValue(c));
-            result.append(defaultMap);
+            result.append(defaultSeparator);
         }
         return result.toString();
     }
