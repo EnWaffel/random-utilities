@@ -9,11 +9,11 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="gml" target="14" />
       <module name="graphic" target="14" />
       <module name="lua__java_natives" target="14" />
       <module name="luagml" target="14" />
       <module name="server" target="11" />
+      <module name="test" target="14" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">

@@ -3,6 +3,7 @@ package de.enwaffel.randomutils.file;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class FileOrPath {
 
@@ -37,6 +38,8 @@ public class FileOrPath {
     }
 
     public static FileOrPath search(FileOrPath folder, String name) {
+        scannedFolders = 0;
+        foundFiles = 0;
         return FileOrPath.path(findPath(folder.getFile(), name));
     }
 
@@ -63,13 +66,25 @@ public class FileOrPath {
                 foundFiles++;
             }
         }
-        System.out.println(scannedFolders + " | " + foundFiles);
         return files;
     }
 
     @Override
     public String toString() {
         return getPath();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        FileOrPath that = (FileOrPath) o;
+        return path.equals(that.path);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(path);
     }
 
 }

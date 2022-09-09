@@ -1,6 +1,7 @@
 package de.enwaffel.randomutils;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class Properties {
 
@@ -23,6 +24,15 @@ public class Properties {
     public Properties remove(String key) {
         properties.remove(key);
         return this;
+    }
+
+    public boolean has(String key) {
+        for (String k : properties.keySet()) {
+            if (k.equals(key)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public HashMap<String, Property> list() {

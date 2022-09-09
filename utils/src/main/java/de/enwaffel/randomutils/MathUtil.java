@@ -43,4 +43,5 @@ public class MathUtil {
     public static double percentOf(double v, double of, double p) {
         return v * (p / of);
     }
+
 }

@@ -54,7 +54,7 @@ public class InByteBuffer extends ByteBuffer {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return new byte[]{};
+        return new byte[0];
     }
 
     private byte next() {

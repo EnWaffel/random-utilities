@@ -7,42 +7,8 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
-/**
- * This is literally useless
- * This is literally useless
- * This is literally useless
- * This is literally useless
- * This is literally useless
- * This is literally useless
- * This is literally useless
- * This is literally useless
- * This is literally useless
- * This is literally useless
- * This is literally useless
- * This is literally useless
- * This is literally useless
- * This is literally useless
- * This is literally useless
- */
 public class Bitmap {
 
-    /**
-     * This is literally useless
-     * This is literally useless
-     * This is literally useless
-     * This is literally useless
-     * This is literally useless
-     * This is literally useless
-     * This is literally useless
-     * This is literally useless
-     * This is literally useless
-     * This is literally useless
-     * This is literally useless
-     * This is literally useless
-     * This is literally useless
-     * This is literally useless
-     * This is literally useless
-     */
     public static int[][] generateBitmap(FileOrPath fileOrPath) throws Exception {
         BufferedImage img = ImageIO.read(fileOrPath.getFile());
         int[][] map = new int[img.getWidth() * img.getHeight() + 1][4];
@@ -60,23 +26,6 @@ public class Bitmap {
         return map;
     }
 
-    /**
-     * This is literally useless
-     * This is literally useless
-     * This is literally useless
-     * This is literally useless
-     * This is literally useless
-     * This is literally useless
-     * This is literally useless
-     * This is literally useless
-     * This is literally useless
-     * This is literally useless
-     * This is literally useless
-     * This is literally useless
-     * This is literally useless
-     * This is literally useless
-     * This is literally useless
-     */
     public static JSONArray asJson(int[][] map) {
         JSONArray arr = new JSONArray();
         for (int i = 0;i < map.length;i++) {
@@ -90,23 +39,6 @@ public class Bitmap {
         return arr;
     }
 
-    /**
-     * This is literally useless
-     * This is literally useless
-     * This is literally useless
-     * This is literally useless
-     * This is literally useless
-     * This is literally useless
-     * This is literally useless
-     * This is literally useless
-     * This is literally useless
-     * This is literally useless
-     * This is literally useless
-     * This is literally useless
-     * This is literally useless
-     * This is literally useless
-     * This is literally useless
-     */
     public static String asCID(int[][] map) {
         StringBuilder b = new StringBuilder();
         b.append(map[0][0]).append(" ").append(map[0][1]).append("-");
