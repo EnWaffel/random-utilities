@@ -23,7 +23,7 @@ public abstract class State implements Base {
     }
 
     @Override
-    public void remove() {}
+    public void destroy() {}
 
     public List<Base> getMembers() {
         return members;

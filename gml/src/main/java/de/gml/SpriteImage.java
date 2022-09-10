@@ -15,7 +15,7 @@ public class SpriteImage {
     }
 
     protected SpriteImage() throws IllegalAccessException {
-        throw new IllegalAccessException("illegal constructor accessed");
+        throw new IllegalAccessException("Illegal constructor accessed");
     }
 
     public float getWidth() {

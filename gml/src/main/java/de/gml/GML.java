@@ -18,6 +18,9 @@ public class GML {
     private static int ups;
     private static int fps;
     public static int maxFPS = 60;
+    public static boolean useCache = true;
+    public static boolean pauseOnLostFocus = true;
+    protected static boolean running = true;
     protected static State currentState;
 
     protected static SoundSystem soundSystem;
@@ -43,6 +46,11 @@ public class GML {
         renderSystem.init(properties);
         cameras.add(createCamera());
 
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            soundSystem.disable();
+            renderSystem.disable();
+        }));
+
         run();
         initialized = true;
         switchState(initialState);
@@ -52,10 +60,10 @@ public class GML {
 
     public static Sound loadSound(FileOrPath fileOrPath) {
         check();
-        Sound obj = checkCache(fileOrPath, cache_sound);
+        Sound obj = useCache ? checkCache(fileOrPath, cache_sound) : null;
         if (obj == null) {
             obj = soundSystem.load(fileOrPath);
-            cache_sound.put(fileOrPath, obj);
+            if (useCache) cache_sound.put(fileOrPath, obj);
         }
         return obj;
     }
@@ -64,10 +72,10 @@ public class GML {
     // image
     public static SpriteImage loadImage(FileOrPath fileOrPath) {
         check();
-        SpriteImage obj = checkCache(fileOrPath, cache_image);
+        SpriteImage obj = useCache ? checkCache(fileOrPath, cache_image) : null;
         if (obj == null) {
             obj = load_image(fileOrPath);
-            cache_image.put(fileOrPath, obj);
+            if (useCache) cache_image.put(fileOrPath, obj);
         }
         return obj;
     }
@@ -76,11 +84,11 @@ public class GML {
         UUID textureId = UUID.randomUUID();
         final Texture[] glTexture = new Texture[1];
         final boolean[] returned = new boolean[1];
-        renderSystem.scheduleTexture(fileOrPath, texture -> {
+        renderSystem.requestTexture(fileOrPath, texture -> {
             glTexture[0] = texture;
             returned[0] = true;
         });
-        while (!returned[0]) { Thread.onSpinWait(); }
+        while (!returned[0]) Thread.onSpinWait();
         return new SpriteImage(textureId, glTexture[0]);
     }
 
@@ -96,10 +104,10 @@ public class GML {
 
     public static void switchState(State state) {
         if (state == null) throw new IllegalArgumentException("GML Error: state cannot be null");
-        if (currentState != null) currentState.remove();
+        if (currentState != null) currentState.destroy();
         for (Sound sound : SoundSystem.sounds) { SoundSystem.deleteSound(sound); }
+        state.create();
         currentState = state;
-        currentState.create();
     }
 
     // util
@@ -145,6 +153,8 @@ public class GML {
         float deltaTime = 0;
 
         while (!updateThread.isInterrupted()) {
+            while (!running) Thread.onSpinWait();
+
             long now = System.nanoTime();
             delta += (now - lastTime) / ns;
             lastTime = now;
@@ -152,6 +162,7 @@ public class GML {
                 delta--;
                 // update
                 long last_time = System.nanoTime();
+                soundSystem.update(deltaTime);
                 if (currentState != null) currentState.update(deltaTime);
                 deltaTime = System.nanoTime() - last_time / 1000000000F;
                 frames++;
@@ -172,6 +183,8 @@ public class GML {
         int frames = 0;
 
         while (!renderThread.isInterrupted()) {
+            while (!running) Thread.onSpinWait();
+
             long now = System.nanoTime();
             delta += (now - lastTime) / ns;
             lastTime = now;

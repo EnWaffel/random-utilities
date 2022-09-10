@@ -16,7 +16,9 @@ public class Property {
         return (double) value;
     }
 
-    public float f() { return (float) value; }
+    public float f() {
+        return (float) value;
+    }
 
     public int i() {
         return (int) value;

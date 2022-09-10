@@ -1,4 +1,5 @@
 import de.gml.GML;
+import de.gml.TestState;
 
 public class GMLTest {
 

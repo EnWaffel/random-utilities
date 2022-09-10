@@ -77,6 +77,6 @@ public class Sprite implements Base {
     }
 
     @Override
-    public void remove() {}
+    public void destroy() {}
 
 }

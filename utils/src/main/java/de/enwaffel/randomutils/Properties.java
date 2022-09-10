@@ -1,7 +1,6 @@
 package de.enwaffel.randomutils;
 
 import java.util.HashMap;
-import java.util.Map;
 
 public class Properties {
 

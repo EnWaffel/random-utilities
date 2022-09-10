@@ -17,6 +17,7 @@ public class Sound implements Base {
     protected final int loop;
     protected float lengthInSamples;
     protected boolean playing;
+    protected boolean paused;
     protected final FloatBuffer sample_offset = FloatBuffer.allocate(1);
 
     protected Sound(int buffer, int source, float[] sourcePos, float[] sourceVel, int format, int size, int freq, int loop) {
@@ -41,11 +42,13 @@ public class Sound implements Base {
     public void play() {
         SoundSystem.al.alSourcePlay(source);
         playing = true;
+        paused = false;
     }
 
     public void pause() {
         SoundSystem.al.alSourcePause(source);
         playing = false;
+        paused = true;
     }
 
     public void stop() {
@@ -71,7 +74,7 @@ public class Sound implements Base {
     }
 
     @Override
-    public void remove() {
+    public void destroy() {
 
     }
 
