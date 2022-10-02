@@ -11,6 +11,8 @@ import org.luaj.vm2.lib.VarArgFunction;
 import org.luaj.vm2.lib.ZeroArgFunction;
 import org.luaj.vm2.lib.jse.JsePlatform;
 
+import java.io.IOException;
+
 /**
  * USE THIS CLASS ONLY FOR LUA PROJECTS!!!!!!!
  */
@@ -20,15 +22,38 @@ public class GMLMain {
     protected static Properties p;
 
     public static void main(String[] args) {
-        p = new Properties();
-        switch (args[0]) {
-            case "test": p.set("command", "test");
-            case "build": p.set("command", "build");
-            default: p.set("command", "none");
+        if (args.length < 1) {
+            ERR("GML Error: Usage: <test, build>");
+            System.exit(-1);
         }
 
+        p = new Properties();
+
+        switch (args[0]) {
+            case "test": {
+                p.set("command", "test");
+
+                run();
+            }
+            case "build": {
+                p.set("command", "build");
+
+                compile();
+            }
+            default: {
+                ERR("GML Error: Usage: <test, build>");
+                System.exit(-1);
+            }
+        }
+    }
+
+    protected static void run() {
         g.set("GML", new LL.LL_GML());
         g.loadfile("gml_lua_program/main.lua").call();
+    }
+
+    protected static void compile() {
+
     }
 
     protected static LuaValue ERR(String err) {

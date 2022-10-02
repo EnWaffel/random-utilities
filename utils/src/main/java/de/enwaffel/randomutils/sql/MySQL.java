@@ -1,28 +1,51 @@
-package de.enwaffel.randomutils.sql.mysql;
+package de.enwaffel.randomutils.sql;
 
-import de.enwaffel.randomutils.sql.PullEntries;
-import de.enwaffel.randomutils.sql.SQL;
-import de.enwaffel.randomutils.sql.SQLDriver;
-import de.enwaffel.randomutils.sql.SQLEntry;
+import de.enwaffel.randomutils.ArrayUtil;
 
 import java.sql.*;
 import java.util.Collection;
+import java.util.Properties;
 
 /**
- * Parameters: driver : {@link SQLDriver}, address : {@link String}, database : {@link String}, username : {@link String}, password : {@link String}
+ * Parameters: address : {@link String}, database : {@link String}, username : {@link String}, password : {@link String}, driver(optional) : {@code YourMySQLDriver}
  */
 public class MySQL extends SQL {
 
     private final Connection connection;
 
-    protected MySQL(SQLDriver driver, String address, String db, String un, String pw) throws SQLException {
-        super(driver);
+    protected MySQL(String address, String db, String un, String pw) throws SQLException {
         String url = "jdbc:mysql://" + address + "/" + db;
-        connection = DriverManager.getConnection(url, un, pw);
+        getDriver("com.mysql.cj.jdbc.Driver");
+        java.sql.Driver driver = getDriver("com.mysql.cj.jdbc.Driver");
+        Properties info = new Properties();
+        info.put("user", un);
+        info.put("password", pw);
+        connection = driver.connect(url, info);
+    }
+
+    protected MySQL(String address, String db, String un, String pw, String d) throws SQLException {
+        String url = "jdbc:mysql//" + address + "/" + db;
+        java.sql.Driver driver = getDriver(d);
+        Properties info = new Properties();
+        info.put("user", un);
+        info.put("password", pw);
+        connection = driver.connect(url, info);
+    }
+
+    private java.sql.Driver getDriver(String d) {
+        try {
+            Class<?> c = Class.forName(d);
+            if (!ArrayUtil.contains(c.getInterfaces(), java.sql.Driver.class)) throw new SQLException("Driver Class is not a valid driver class");
+            Class<java.sql.Driver>  driverClass = (Class<Driver>) c;
+            if (driverClass.getDeclaredConstructors()[0].getParameters().length > 0) throw new SQLException("Driver Class has too many arguments in the constructor");
+            return driverClass.getDeclaredConstructor().newInstance();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
-    public boolean push(String table, SQLEntry entry) {
+    protected boolean set(SQLTask task, String table, SQLEntry entry) {
         try {
             Collection<String> labels = entry.getEntries().keySet();
             Collection<Object> values = entry.getEntries().values();
@@ -62,7 +85,7 @@ public class MySQL extends SQL {
     }
 
     @Override
-    public boolean commit(String table, SQLEntry entry, String anyLabel, Object anyValue) {
+    protected boolean update(SQLTask task, String table, SQLEntry entry, String anyLabel, Object anyValue) {
         try {
             Collection<String> labels = entry.getEntries().keySet();
             Object[] values = entry.getEntries().values().toArray();
@@ -94,7 +117,7 @@ public class MySQL extends SQL {
     }
 
     @Override
-    public boolean has(String table, String label, Object value) {
+    protected boolean has(SQLTask task, String table, String label, Object value) {
         try {
             String v = value.toString();
             PreparedStatement statement = connection.prepareStatement("SELECT '" + label + "' FROM " + table + " WHERE " + label + " = '" + v + "';");
@@ -112,7 +135,7 @@ public class MySQL extends SQL {
     }
 
     @Override
-    public SQLEntry pull(String table, PullEntries entries, String[] anyLabels, Object... anyValues) {
+    protected SQLEntry get(SQLTask task, String table, PullEntries entries, String[] anyLabels, Object... anyValues) {
         try {
             SQLEntry entry = new SQLEntry();
             StringBuilder args = new StringBuilder("SELECT ");

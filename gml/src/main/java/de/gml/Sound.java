@@ -5,7 +5,7 @@ import com.jogamp.openal.AL;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
-public class Sound implements Base {
+public class Sound extends Resource implements Base {
 
     protected final int buffer;
     protected final int source;

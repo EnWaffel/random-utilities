@@ -1,30 +1,36 @@
 package de.gml;
 
 import com.jogamp.nativewindow.WindowClosingProtocol;
-import com.jogamp.newt.event.*;
+import com.jogamp.newt.event.WindowEvent;
+import com.jogamp.newt.event.WindowListener;
+import com.jogamp.newt.event.WindowUpdateEvent;
 import com.jogamp.newt.opengl.GLWindow;
 import com.jogamp.opengl.*;
 import com.jogamp.opengl.util.texture.Texture;
-import com.jogamp.opengl.util.texture.TextureIO;
+import com.jogamp.opengl.util.texture.TextureCoords;
+import com.jogamp.opengl.util.texture.awt.AWTTextureIO;
 import de.enwaffel.randomutils.Properties;
 import de.enwaffel.randomutils.file.FileOrPath;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class RenderSystem implements ServiceBase, GLEventListener {
+public class GLManager implements ServiceBase, GLEventListener {
 
     private GLProfile profile;
     public static GLWindow window;
     private GLCapabilities windowCapabilities;
-    private HashMap<FileOrPath, callback001> requestedTextures = new HashMap<>();
+    private final HashMap<FileOrPath, callback001> requestedTextures = new HashMap<>();
+    private final HashMap<BufferedImage, callback001> requestedTexturesB = new HashMap<>();
     private Properties properties;
     private int zoom = 1;
 
-    protected RenderSystem() {
+    protected GLManager() {
     }
 
     @Override
@@ -66,13 +72,17 @@ public class RenderSystem implements ServiceBase, GLEventListener {
         requestedTextures.put(fileOrPath, callback);
     }
 
+    protected void requestTextureB(BufferedImage image, callback001 callback) {
+        requestedTexturesB.put(image, callback);
+    }
+
     @Override
     public void init(GLAutoDrawable glAutoDrawable) {
         GL2 gl = glAutoDrawable.getGL().getGL2();
 
         gl.glClearColor(0, 0, 0, 1);
         gl.glEnable(GL2.GL_TEXTURE_2D);
-        gl.glTranslated(-properties.get("windowWidth").i(), properties.get("windowHeight").i(), 0);
+        //gl.glViewport(0, 0, properties.get("windowWidth").i(), properties.get("windowHeight").i());
     }
 
     @Override
@@ -84,8 +94,15 @@ public class RenderSystem implements ServiceBase, GLEventListener {
     public void display(GLAutoDrawable glAutoDrawable) {
         try {
             for (Map.Entry<FileOrPath, callback001> set : requestedTextures.entrySet()) {
-                set.getValue().call(TextureIO.newTexture(set.getKey().getFile(), true));
+                BufferedImage b = ImageIO.read(set.getKey().getFile());
+                set.getValue().call(AWTTextureIO.newTexture(profile, b, true), b);
                 requestedTextures.remove(set.getKey());
+            }
+
+            for (Map.Entry<BufferedImage, callback001> set : requestedTexturesB.entrySet()) {
+                BufferedImage b = set.getKey();
+                set.getValue().call(AWTTextureIO.newTexture(profile, b, true), b);
+                requestedTexturesB.remove(set.getKey());
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -99,47 +116,62 @@ public class RenderSystem implements ServiceBase, GLEventListener {
             for (Base member : GML.currentState.getMembers()) {
                 if (member instanceof Sprite) {
                     Sprite sprite = (Sprite) member;
-                    float x = sprite.getX() * 2;
-                    float y = (sprite.getY() + sprite.getHeight()) * 2;
-                    float width = (sprite.getWidth() != 1 ? sprite.getWidth() : 2) * 2;
-                    float height = (sprite.getHeight() != 1 ? sprite.getHeight() : 2) * 2;
+                    float x = sprite.getX();
+                    float y = (sprite.getY());
+                    float width = (sprite.getWidth() != 1 ? sprite.getWidth() : 2);
+                    float height = (sprite.getHeight() != 1 ? sprite.getHeight() : 2);
+                    if (sprite.getTexture() != null) {
+                        x -= sprite.getTexture()._offsetX;
+                        y -= sprite.getTexture()._offsetY;
+                        width = sprite.getTexture().b.getWidth();
+                        height = sprite.getTexture().b.getHeight();
+                    }
+
+                    gl.glBegin(GL2.GL_LINES);
+                    gl.glVertex2f(x, y);
+                    gl.glVertex2f(x, y + height);
+                    gl.glVertex2f(x + width, y + height);
+                    gl.glVertex2f(x + width, y);
+                    gl.glEnd();
 
                     if (sprite.getTexture() == null) {
                         gl.glBegin(GL2.GL_QUADS);
-                        gl.glVertex2f(x, -y);
-                        gl.glVertex2f(x + width, -y);
-                        gl.glVertex2f(x + width, -y - height);
-                        gl.glVertex2f(x, -y - height);
+                        gl.glVertex2f(x, y);
+                        gl.glVertex2f(x, y + height);
+                        gl.glVertex2f(x + width, y + height);
+                        gl.glVertex2f(x + width, y);
                         gl.glEnd();
                     } else {
                         Texture texture = sprite.getTexture().glTexture;
-                        gl.glBindTexture(GL2.GL_TEXTURE_2D, texture.getTextureObject());
+                        TextureCoords texCoords = texture.getImageTexCoords();
+                        texture.enable(gl);
+                        texture.bind(gl);
+                        //gl.glRotatef( 15, 0.0f, 1.0f, 0.0f );
+
 
                         gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_NEAREST);
                         gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_NEAREST);
 
-                        gl.glRotatef(-0, 0, 0, 1);
-
                         gl.glBegin(GL2.GL_QUADS);
-                        gl.glTexCoord2d(0, 0);
-                        gl.glVertex2d(x, -y);
-                        gl.glTexCoord2d(1, 0);
-                        gl.glVertex2d(x + width, -y);
-                        gl.glTexCoord2d(1, 1);
-                        gl.glVertex2d(x + width, -y + height);
-                        gl.glTexCoord2d(0, 1);
-                        gl.glVertex2d(x, -y + height);
-                        gl.glEnd();
-                        gl.glFlush();
 
-                        gl.glBindTexture(GL2.GL_TEXTURE_2D, 0);
+                        gl.glVertex2f(x, y);
+                        gl.glTexCoord2f(texCoords.left(), texCoords.top());
+
+                        gl.glVertex2f(x, y + height);
+                        gl.glTexCoord2f(texCoords.right(), texCoords.top());
+
+                        gl.glVertex2f(x + width, y + height);
+                        gl.glTexCoord2f(texCoords.right(), texCoords.bottom());
+
+                        gl.glVertex2f(x + width, y);
+                        gl.glTexCoord2f(texCoords.left(), texCoords.bottom());
+
+                        gl.glEnd();
+                        texture.disable(gl);
+
                     }
                 }
             }
-/*
-
-
- */
         }
     }
 
@@ -152,8 +184,6 @@ public class RenderSystem implements ServiceBase, GLEventListener {
 
         gl.glOrtho(-properties.get("windowWidth").i(), properties.get("windowWidth").i(), -properties.get("windowHeight").i(), properties.get("windowHeight").i(), -1, 1);
         gl.glMatrixMode(GL2.GL_MODELVIEW);
-
-        //gl.glTranslated(-properties.get("windowWidth").i() + window.getWidth() % properties.get("windowHeight").i(), properties.get("windowHeight").i() + window.getHeight() % properties.get("windowHeight").i(), 0);
     }
 
     protected static class GLWindowListener implements WindowListener {

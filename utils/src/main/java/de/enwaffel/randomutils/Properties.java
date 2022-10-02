@@ -38,4 +38,11 @@ public class Properties {
         return properties;
     }
 
+    @Override
+    public String toString() {
+        return "Properties{" +
+                "properties=" + properties +
+                '}';
+    }
+
 }

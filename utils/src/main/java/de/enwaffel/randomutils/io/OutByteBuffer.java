@@ -28,6 +28,12 @@ public class OutByteBuffer extends ByteBuffer {
         return this;
     }
 
+    public OutByteBuffer write(int b) {
+        add(b);
+        return this;
+    }
+
+
     public OutByteBuffer write(byte[] arr) {
         for (byte b : arr) {
             add(b);
@@ -35,10 +41,17 @@ public class OutByteBuffer extends ByteBuffer {
         return this;
     }
 
+    public OutByteBuffer write(int[] arr) {
+        for (int i : arr) {
+            add(i);
+        }
+        return this;
+    }
+
     /**
      * Writes the buffered data to the OutputStream.
      */
-    public void complete() {
+    public void writeToOutput() {
         try {
             os.write(0x01); // write SOH byte (start of heading)
             os.write(0x30);

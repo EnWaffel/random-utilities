@@ -5,15 +5,20 @@ import java.awt.Color;
 public class Sprite implements Base {
 
     private Camera camera = GML.cameras.get(0);
+    private AnimationController animationController = new AnimationController(this);
     private float x;
     private float y;
     private float width;
     private float height;
-    private SpriteImage texture;
+    private TextureImage texture;
     private Color color;
 
     public Camera getCamera() {
         return camera;
+    }
+
+    public AnimationController getAnimationController() {
+        return animationController;
     }
 
     public float getX() {
@@ -32,7 +37,7 @@ public class Sprite implements Base {
         return height;
     }
 
-    public SpriteImage getTexture() {
+    public TextureImage getTexture() {
         return texture;
     }
 
@@ -60,7 +65,7 @@ public class Sprite implements Base {
         this.height = height;
     }
 
-    public void setTexture(SpriteImage texture) {
+    public void setTexture(TextureImage texture) {
         this.texture = texture;
     }
 
@@ -73,7 +78,7 @@ public class Sprite implements Base {
 
     @Override
     public void update(float delta) {
-
+        animationController.update(delta);
     }
 
     @Override

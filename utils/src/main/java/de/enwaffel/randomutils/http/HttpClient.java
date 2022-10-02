@@ -13,6 +13,9 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * A simpler version of the java HttpClient.
+ */
 public class HttpClient {
 
     private final java.net.http.HttpClient client;

@@ -3,13 +3,22 @@ package de.gml;
 import com.jogamp.opengl.util.texture.Texture;
 import de.enwaffel.randomutils.Properties;
 import de.enwaffel.randomutils.file.FileOrPath;
+import org.w3c.dom.Document;
 
+import javax.xml.XMLConstants;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class GML {
+
+    // constants
+    protected static int textureIdEnumerator = 0;
+    protected static int soundIdEnumerator = 0;
 
     private static Properties properties;
     private static boolean initialized;
@@ -24,12 +33,12 @@ public class GML {
     protected static State currentState;
 
     protected static SoundSystem soundSystem;
-    protected static RenderSystem renderSystem;
+    protected static GLManager glManager;
 
     // cache
 
-    protected static final HashMap<FileOrPath, Sound> cache_sound = new HashMap<>();
-    protected static final HashMap<FileOrPath, SpriteImage> cache_image = new HashMap<>();
+    protected static final List<Sound> cache_sound = new ArrayList<>();
+    protected static final List<TextureImage> cache_image = new ArrayList<>();
     protected static final List<Camera> cameras = new ArrayList<>();
 
     public static void init(State initialState, String windowTitle, int windowWidth, int windowHeight) {
@@ -42,13 +51,13 @@ public class GML {
         // services
         soundSystem = new SoundSystem();
         soundSystem.init(new Properties());
-        renderSystem = new RenderSystem();
-        renderSystem.init(properties);
+        glManager = new GLManager();
+        glManager.init(properties);
         cameras.add(createCamera());
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             soundSystem.disable();
-            renderSystem.disable();
+            glManager.disable();
         }));
 
         run();
@@ -63,33 +72,52 @@ public class GML {
         Sound obj = useCache ? checkCache(fileOrPath, cache_sound) : null;
         if (obj == null) {
             obj = soundSystem.load(fileOrPath);
-            if (useCache) cache_sound.put(fileOrPath, obj);
+            if (useCache) cache_sound.add(obj);
         }
         return obj;
     }
-
 
     // image
-    public static SpriteImage loadImage(FileOrPath fileOrPath) {
+    public static TextureImage loadImage(FileOrPath fileOrPath) {
         check();
-        SpriteImage obj = useCache ? checkCache(fileOrPath, cache_image) : null;
+        TextureImage obj = useCache ? checkCache(fileOrPath, cache_image) : null;
         if (obj == null) {
             obj = load_image(fileOrPath);
-            if (useCache) cache_image.put(fileOrPath, obj);
+            if (useCache) cache_image.add(obj);
         }
         return obj;
     }
 
-    private static SpriteImage load_image(FileOrPath fileOrPath) {
-        UUID textureId = UUID.randomUUID();
-        final Texture[] glTexture = new Texture[1];
-        final boolean[] returned = new boolean[1];
-        renderSystem.requestTexture(fileOrPath, texture -> {
-            glTexture[0] = texture;
-            returned[0] = true;
+    private static TextureImage load_image(FileOrPath fileOrPath) {
+        textureIdEnumerator++;
+        AtomicReference<Texture> glTexture = new AtomicReference<>();
+        AtomicBoolean returned = new AtomicBoolean();
+        AtomicReference<BufferedImage> b = new AtomicReference<>();
+        glManager.requestTexture(fileOrPath, (texture, buff) -> {
+            glTexture.set(texture);
+            returned.set(true);
+            b.set(buff);
         });
-        while (!returned[0]) Thread.onSpinWait();
-        return new SpriteImage(textureId, glTexture[0]);
+        while (!returned.get()) Thread.onSpinWait();
+        TextureImage textureImage = new TextureImage(glTexture.get(), b.get());
+        textureImage.id = textureIdEnumerator;
+        return textureImage;
+    }
+
+    // data file
+
+    public static Document loadXML(FileOrPath fileOrPath) {
+        try {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING,true);
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document doc = builder.parse(fileOrPath.getFile());
+            doc.normalize();
+            return doc;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     // camera
@@ -126,11 +154,29 @@ public class GML {
         if (!initialized) throw new RuntimeException("GML Error: not initialized");
     }
 
-    private static <T> T checkCache(Object obj, HashMap<?, T> cache) {
-        for (Object o : cache.keySet()) {
-            if (o.equals(obj)) return cache.get(o);
+    private static <T extends Resource> T checkCache(Object obj, List<T> cache) {
+        for (Resource r : cache) {
+            if (obj.getClass().equals(FileOrPath.class) && r.p != null) {
+                if (r.p.equals(((FileOrPath) obj).getPath())) {
+                    return (T) r;
+                }
+            }
+            if (obj.getClass().equals(BufferedImage.class) && r.p != null) {
+                if (((TextureImage) r).b.equals(obj)) {
+                    return (T) r;
+                }
+            }
         }
         return null;
+    }
+
+    protected static void ERR(String err) {
+        throw new RuntimeException("GML Error: " + err);
+    }
+
+    protected static void ERR(Throwable throwable) {
+        System.err.print("GML Error: ");
+        throw new RuntimeException(throwable);
     }
 
     // game loops
@@ -190,7 +236,7 @@ public class GML {
             lastTime = now;
             while (delta >= 1) {
                 delta--;
-                renderSystem.draw();
+                glManager.draw();
                 frames++;
             }
             if (System.currentTimeMillis() - timer > 1000) {

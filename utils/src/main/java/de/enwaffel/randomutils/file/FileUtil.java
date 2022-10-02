@@ -10,6 +10,9 @@ import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 
+/**
+ * File writing / reading / etc. utilities.
+ */
 public class FileUtil {
 
     // read

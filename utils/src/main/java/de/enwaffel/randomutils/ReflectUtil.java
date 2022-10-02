@@ -19,7 +19,7 @@ public class ReflectUtil {
                 .collect(Collectors.toList());
     }
 
-    private static Class<?> getClass(String className, String packageName) {
+    public static Class<?> getClass(String className, String packageName) {
         try {
             return Class.forName(packageName + "."
                     + className.substring(0, className.lastIndexOf('.')));

@@ -34,6 +34,8 @@ public class SoundSystem implements ServiceBase {
     }
 
     public Sound load_wav(FileOrPath fileOrPath) {
+        GML.soundIdEnumerator++;
+
         int[] buffer = new int[1];
         int[] source = new int[1];
         float[] sourcePos = {0.0f, 0.0f, 0.0f};
@@ -59,6 +61,8 @@ public class SoundSystem implements ServiceBase {
         al.alSourcei(source[0], AL.AL_LOOPING, loop[0]);
 
         Sound sound = new Sound(buffer[0], source[0], sourcePos, sourceVel, format[0], size[0], freq[0], loop[0]);
+        sound.id = GML.soundIdEnumerator;
+        sound.p = fileOrPath.getPath();
         sounds.add(sound);
         return sound;
     }

@@ -5,6 +5,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * A utility class with contains either a path or a file object.
+ */
 public class FileOrPath {
 
     private static int scannedFolders;

@@ -1,12 +1,10 @@
 package de.enwaffel.randomutils.nio;
 
-import de.enwaffel.randomutils.io.InByteBuffer;
-import de.enwaffel.randomutils.io.OutByteBuffer;
-
-import java.net.InetSocketAddress;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 public interface Connection {
-    OutByteBuffer getOutputBuffer();
-    InByteBuffer getInputBuffer();
-    InetSocketAddress getInetAddress();
+    boolean isOpen();
+    InputStream getInput();
+    OutputStream getOutput();
 }

@@ -11,10 +11,13 @@ public class TestState extends State {
         Sound s = GML.loadSound(FileOrPath.path("test.wav"));
         Sound s1 = GML.loadSound(FileOrPath.path("test1.wav"));
         sprite = new Sprite();
-        sprite.setWidth(300);
-        sprite.setHeight(300);
-        sprite.setX(0);
-        sprite.setY(0);
+        sprite.setWidth(500);
+        sprite.setHeight(500);
+        sprite.setX(10);
+        sprite.setY(10);
+        LoadedAnimation anim = SparrowAtlas.load(FileOrPath.path("a.xml"), FileOrPath.path("a.png"));
+        sprite.getAnimationController().load(anim);
+        sprite.getAnimationController().play("BF idle dance");
         add(sprite);
     }
 

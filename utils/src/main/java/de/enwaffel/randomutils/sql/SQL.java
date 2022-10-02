@@ -1,33 +1,28 @@
 package de.enwaffel.randomutils.sql;
 
-public abstract class SQL {
+public abstract class SQL implements SQLTaskBuilder {
 
-    private SQLDriver driver;
-
-    public SQL(SQLDriver driver) {
-        this.driver = driver;
+    protected SQL() {
     }
 
     /**
-     * Forces the data {@code entry} onto the database
-     * (Like GitHub where the data can also be pushed)
+     * Forces the data {@code entry} into the database
      * @param table The table the data is sent to.
      * @param entry The actual data.
      * @return {@code true} if succeeded, {@code false} if not.
      */
-    public abstract boolean push(String table, SQLEntry entry);
+    protected abstract boolean set(SQLTask task, String table, SQLEntry entry);
 
     /**
      * Goes through every entry in {@code table} and checks if {@code anyLabel} with {@code anyValue} is present within the entry.
      * When the check succeeds, then all the data from {@code entry} is updated.
-     * (Like GitHub where the data can also be committed)
      * @param table The table the data is sent to.
      * @param entry The actual data.
      * @param anyLabel The labels that should be checked.
      * @param anyValue The data the checked labels should have.
      * @return {@code true} if succeeded, {@code false} if not.
      */
-    public abstract boolean commit(String table, SQLEntry entry, String anyLabel, Object anyValue);
+    protected abstract boolean update(SQLTask task, String table, SQLEntry entry, String anyLabel, Object anyValue);
 
     /**
      * Checks if {@code label} with the data {@code value} is present.
@@ -36,7 +31,7 @@ public abstract class SQL {
      * @param value The value the checked label should have.
      * @return {@code true} if the label with the same data is present, {@code false} if not.
      */
-    public abstract boolean has(String table, String label, Object value);
+    protected abstract boolean has(SQLTask task, String table, String label, Object value);
 
     /**
      * Goes through every entry in {@code table} and checks if {@code anyLabels} with {@code anyValues} are present within the entry.
@@ -47,10 +42,26 @@ public abstract class SQL {
      * @param anyValues The data the checked labels should have.
      * @return The retrieved data.
      */
-    public abstract SQLEntry pull(String table, PullEntries entries, String[] anyLabels, Object... anyValues);
+    protected abstract SQLEntry get(SQLTask task, String table, PullEntries entries, String[] anyLabels, Object... anyValues);
 
-    public SQLDriver getDriver() {
-        return driver;
+    @Override
+    public SQLSetTask newTask(String table, SQLEntry entry) {
+        return new SQLSetTask(this, table, entry);
+    }
+
+    @Override
+    public SQLUpdateTask newTask(String table, SQLEntry entry, String anyLabel, Object anyValue) {
+        return new SQLUpdateTask(this, table, entry, anyLabel, anyValue);
+    }
+
+    @Override
+    public SQLHasTask newTask(String table, String label, Object value) {
+        return new SQLHasTask(this, table, label, value);
+    }
+
+    @Override
+    public SQLGetTask newTask(String table, PullEntries entries, String[] anyLabels, Object... anyValues) {
+        return null;
     }
 
     /**
@@ -67,8 +78,7 @@ public abstract class SQL {
             }
             return (T) t.getDeclaredConstructor(classParameters).newInstance(parameters);
         } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+            throw new RuntimeException(e);
         }
     }
 
