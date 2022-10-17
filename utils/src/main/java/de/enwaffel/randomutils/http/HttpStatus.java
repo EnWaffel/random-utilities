@@ -1,7 +1,7 @@
 package de.enwaffel.randomutils.http;
 
 // These are the Http response status codes from the firefox dev docs (https://developer.mozilla.org/en-US/docs/Web/HTTP/Status)
-public enum HttpResponseCode {
+public enum HttpStatus {
     none(-1),
     // info codes
     CONTINUE(100),
@@ -73,7 +73,7 @@ public enum HttpResponseCode {
     NETWORK_AUTHENTICATION_REQUIRED(511);
 
     final int code;
-    HttpResponseCode(int code) {
+    HttpStatus(int code) {
         this.code = code;
     }
 
@@ -81,8 +81,8 @@ public enum HttpResponseCode {
         return code;
     }
 
-    public static HttpResponseCode fromCode(int code) {
-        for (HttpResponseCode _code : values()) {
+    public static HttpStatus fromCode(int code) {
+        for (HttpStatus _code : values()) {
             if (_code.code() == code) {
                 return _code;
             }
@@ -92,7 +92,7 @@ public enum HttpResponseCode {
 
     @Override
     public String toString() {
-        return this.describeConstable().isPresent() ? this.describeConstable().get().constantName() : "none";
+        return "this.describeConstable().isPresent() ? this.describeConstable().get().constantName() : 'none';";
     }
 
 }

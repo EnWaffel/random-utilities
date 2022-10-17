@@ -3,16 +3,28 @@ package de.enwaffel.randomutils.sql;
 import de.enwaffel.randomutils.Properties;
 import de.enwaffel.randomutils.callback.Callback;
 
-public class SQLSetTask extends SQLTask {
+public class SQLCreateTableTask extends SQLTask {
 
     private final String table;
-    private final SQLEntry entry;
-    
-    protected SQLSetTask(SQL sql, String table, SQLEntry entry) {
+    private final String[] columns;
+    private String[] extraData = new String[]{};
+    private final SQLDataType[] dataTypes;
+
+    protected SQLCreateTableTask(SQL sql, String table, String[] columns, String[] extraData, SQLDataType... dataTypes) {
         super(sql);
         this.table = table;
-        this.entry = entry;
+        this.columns = columns;
+        this.extraData = extraData;
+        this.dataTypes = dataTypes;
     }
+
+    protected SQLCreateTableTask(SQL sql, String table, String[] columns, SQLDataType... dataTypes) {
+        super(sql);
+        this.table = table;
+        this.columns = columns;
+        this.dataTypes = dataTypes;
+    }
+
 
     @Override
     public void cancel() {
@@ -43,12 +55,12 @@ public class SQLSetTask extends SQLTask {
         try {
             if (cancelled) return false;
 
-            boolean result = sql.set(this, table, entry);
+            boolean result = sql.createTable(this, table, columns, extraData, dataTypes);
 
             if (asyncCallback != null) asyncCallback.call("complete", new Properties().set("result", result));
             return result;
         } catch (Exception e) {
-            System.err.println("SQL Error: Failed to set in database. (" + e.getMessage() + ")");
+            System.err.println("SQL Error: Failed to create table in database. (" + e.getMessage() + ")");
             e.printStackTrace();
             return false;
         }

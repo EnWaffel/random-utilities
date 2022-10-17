@@ -3,15 +3,17 @@ package de.enwaffel.randomutils.sql;
 import de.enwaffel.randomutils.Properties;
 import de.enwaffel.randomutils.callback.Callback;
 
-public class SQLSetTask extends SQLTask {
+public class SQLDeleteTask extends SQLTask {
 
     private final String table;
-    private final SQLEntry entry;
-    
-    protected SQLSetTask(SQL sql, String table, SQLEntry entry) {
+    private final String label;
+    private final Object value;
+
+    protected SQLDeleteTask(SQL sql, String table, String label, Object value) {
         super(sql);
         this.table = table;
-        this.entry = entry;
+        this.label = label;
+        this.value = value;
     }
 
     @Override
@@ -43,12 +45,12 @@ public class SQLSetTask extends SQLTask {
         try {
             if (cancelled) return false;
 
-            boolean result = sql.set(this, table, entry);
+            boolean result = sql.delete(this, table, label, value);
 
             if (asyncCallback != null) asyncCallback.call("complete", new Properties().set("result", result));
             return result;
         } catch (Exception e) {
-            System.err.println("SQL Error: Failed to set in database. (" + e.getMessage() + ")");
+            System.err.println("SQL Error: Failed to delete in database. (" + e.getMessage() + ")");
             e.printStackTrace();
             return false;
         }

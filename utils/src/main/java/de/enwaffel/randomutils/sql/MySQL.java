@@ -11,25 +11,41 @@ import java.util.Properties;
  */
 public class MySQL extends SQL {
 
-    private final Connection connection;
+    private Connection connection;
 
-    protected MySQL(String address, String db, String un, String pw) throws SQLException {
+    protected MySQL(String address, String db, String un, String pw) {
         String url = "jdbc:mysql://" + address + "/" + db;
         getDriver("com.mysql.cj.jdbc.Driver");
         java.sql.Driver driver = getDriver("com.mysql.cj.jdbc.Driver");
         Properties info = new Properties();
         info.put("user", un);
         info.put("password", pw);
-        connection = driver.connect(url, info);
+        try {
+            connection = driver.connect(url, info);
+        } catch (Exception e) {
+            if (e.getMessage().equals("Communications link failure\n" +
+                    "\n" +
+                    "The last packet sent successfully to the server was 0 milliseconds ago. The driver has not received any packets from the server.")) {
+                System.err.println("SQL Error: Failed to connect to database: " + address);
+            }
+        }
     }
 
-    protected MySQL(String address, String db, String un, String pw, String d) throws SQLException {
+    protected MySQL(String address, String db, String un, String pw, String d) {
         String url = "jdbc:mysql//" + address + "/" + db;
         java.sql.Driver driver = getDriver(d);
         Properties info = new Properties();
         info.put("user", un);
         info.put("password", pw);
-        connection = driver.connect(url, info);
+        try {
+            connection = driver.connect(url, info);
+        } catch (Exception e) {
+            if (e.getMessage().equals("Communications link failure\n" +
+                    "\n" +
+                    "The last packet sent successfully to the server was 0 milliseconds ago. The driver has not received any packets from the server.")) {
+                System.err.println("SQL Error: Failed to connect to database: " + address);
+            }
+        }
     }
 
     private java.sql.Driver getDriver(String d) {
@@ -47,6 +63,7 @@ public class MySQL extends SQL {
     @Override
     protected boolean set(SQLTask task, String table, SQLEntry entry) {
         try {
+            if (!SQLUtil.checkTableName(table)) throw new SQLException("Invalid table name for: " + table + " (table name can only contain letters and underscores!)");
             Collection<String> labels = entry.getEntries().keySet();
             Collection<Object> values = entry.getEntries().values();
 
@@ -67,14 +84,14 @@ public class MySQL extends SQL {
 
             int oi = 0;
             for (Object value : values) {
-                args.append(" '").append(value).append("'");
+                args.append("'").append(value).append("'");
                 if (oi < (values.size() - 1)) {
                     args.append(",");
                 }
                 oi++;
             }
             args.append(");");
-
+            if (showGeneratedCode) System.out.println("GENERATED SQL CODE: " + args);
             PreparedStatement post = connection.prepareStatement(args.toString());
             post.executeUpdate();
             return true;
@@ -87,6 +104,7 @@ public class MySQL extends SQL {
     @Override
     protected boolean update(SQLTask task, String table, SQLEntry entry, String anyLabel, Object anyValue) {
         try {
+            if (!SQLUtil.checkTableName(table)) throw new SQLException("Invalid table name for: " + table + " (table name can only contain letters and underscores!)");
             Collection<String> labels = entry.getEntries().keySet();
             Object[] values = entry.getEntries().values().toArray();
 
@@ -106,7 +124,7 @@ public class MySQL extends SQL {
             args.append(" WHERE ").append(anyLabel).append(" = ").append("'").append(anyValue).append("'");
             args.append(";");
 
-
+            if (showGeneratedCode) System.out.println("GENERATED SQL CODE: " + args);
             PreparedStatement post = connection.prepareStatement(args.toString());
             post.executeUpdate();
             return true;
@@ -119,8 +137,12 @@ public class MySQL extends SQL {
     @Override
     protected boolean has(SQLTask task, String table, String label, Object value) {
         try {
+            if (!SQLUtil.checkTableName(table)) throw new SQLException("Invalid table name for: " + table + " (table name can only contain letters and underscores!)");
             String v = value.toString();
-            PreparedStatement statement = connection.prepareStatement("SELECT '" + label + "' FROM " + table + " WHERE " + label + " = '" + v + "';");
+            String args = "SELECT '" + label + "' FROM " + table + " WHERE " + label + " = '" + v + "';";
+
+            if (showGeneratedCode) System.out.println("GENERATED SQL CODE: " + args);
+            PreparedStatement statement = connection.prepareStatement(args);
             ResultSet result = statement.executeQuery();
             int i = 0;
             while (result.next()) {
@@ -137,15 +159,16 @@ public class MySQL extends SQL {
     @Override
     protected SQLEntry get(SQLTask task, String table, PullEntries entries, String[] anyLabels, Object... anyValues) {
         try {
+            if (!SQLUtil.checkTableName(table)) throw new SQLException("Invalid table name for: " + table + " (table name can only contain letters and underscores!)");
             SQLEntry entry = new SQLEntry();
             StringBuilder args = new StringBuilder("SELECT ");
+            String[] names = entries.getEntries().keySet().toArray(new String[]{});
+            Class<?>[] classes = entries.getEntries().values().toArray(new Class<?>[]{});
 
             int li = 0;
-            for (String label : anyLabels) {
+            for (String label : names) {
                 args.append(label);
-                if (li < (anyLabels.length - 1)) {
-                    args.append(",");
-                }
+                if ((li + 1) != names.length) args.append(", ");
                 li++;
             }
             args.append(" FROM ").append(table).append(" WHERE ");
@@ -159,12 +182,10 @@ public class MySQL extends SQL {
                 oi++;
             }
             args.append(";");
-
+            if (showGeneratedCode) System.out.println("GENERATED SQL CODE: " + args);
             PreparedStatement statement = connection.prepareStatement(args.toString());
             ResultSet result = statement.executeQuery();
 
-            String[] names = entries.getEntries().keySet().toArray(new String[]{});
-            Class<?>[] classes = entries.getEntries().values().toArray(new Class<?>[]{});
             int i = 0;
             while (result.next()) {
                 entry.set(names[i], result.getObject(names[i], classes[i]));
@@ -175,6 +196,91 @@ public class MySQL extends SQL {
         } catch (Exception e) {
             e.printStackTrace();
             return new SQLEntry();
+        }
+    }
+
+    @Override
+    protected boolean createTable(SQLTask task, String table, String[] columns, String[] extraData, SQLDataType... dataTypes) {
+        try {
+            if (!SQLUtil.checkTableName(table)) throw new SQLException("Invalid table name for: " + table + " (table name can only contain letters and underscores!)");
+            StringBuilder args = new StringBuilder();
+            args.append("CREATE TABLE ").append(table).append(" (");
+
+            int i = 0;
+            for (String str : columns) {
+                args.append(str).append(" ").append(dataTypes[i].get());
+                if (extraData.length >= (i + 1)) if (extraData[i] != null) args.append("(").append(extraData[i]).append(")");
+                if ((i + 1) != columns.length) args.append(",");
+                i++;
+            }
+
+            args.append(");");
+            if (showGeneratedCode) System.out.println("GENERATED SQL CODE: " + args);
+            PreparedStatement post = connection.prepareStatement(args.toString());
+            post.execute();
+
+            return true;
+        } catch (Exception e) {
+            if (!e.getMessage().contains("already exists")) {
+                e.printStackTrace();
+            }
+            return false;
+        }
+    }
+
+    @Override
+    protected boolean delete(SQLTask task, String table, String label, Object value) {
+        try {
+            if (!SQLUtil.checkTableName(table)) throw new SQLException("Invalid table name for: " + table + " (table name can only contain letters and underscores!)");
+
+            String args = "DELETE FROM " + table + " WHERE " +
+                    label + " = '" + value +
+                    "'";
+
+            if (showGeneratedCode) System.out.println("GENERATED SQL CODE: " + args);
+            PreparedStatement post = connection.prepareStatement(args);
+            post.execute();
+
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    @Override
+    protected boolean clearTable(SQLTask task, String table) {
+        try {
+            if (!SQLUtil.checkTableName(table)) throw new SQLException("Invalid table name for: " + table + " (table name can only contain letters and underscores!)");
+
+            String args = "TRUNCATE TABLE " + table + ";";
+
+            if (showGeneratedCode) System.out.println("GENERATED SQL CODE: " + args);
+            PreparedStatement post = connection.prepareStatement(args);
+            post.execute();
+
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    @Override
+    protected boolean dropTable(SQLTask task, String table) {
+        try {
+            if (!SQLUtil.checkTableName(table)) throw new SQLException("Invalid table name for: " + table + " (table name can only contain letters and underscores!)");
+
+            String args = "DROP TABLE " + table + ";";
+
+            if (showGeneratedCode) System.out.println("GENERATED SQL CODE: " + args);
+            PreparedStatement post = connection.prepareStatement(args);
+            post.execute();
+
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
         }
     }
 

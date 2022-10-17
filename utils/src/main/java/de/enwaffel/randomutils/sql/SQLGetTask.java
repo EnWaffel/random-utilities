@@ -10,6 +10,8 @@ public class SQLGetTask extends SQLTask {
     private final String[] anyLabels;
     private final Object[] anyValues;
 
+    private SQLEntry cached_data;
+
     protected SQLGetTask(SQL sql, String table, PullEntries entries, String[] anyLabels, Object... anyValues) {
         super(sql);
         this.table = table;
@@ -33,6 +35,12 @@ public class SQLGetTask extends SQLTask {
         throw new RuntimeException(new IllegalAccessException("This method is not usable in the SQLGetTask class"));
     }
 
+    public SQLEntry completeGet() {
+        if (cancelled) return new SQLEntry();
+        execute();
+        return cached_data;
+    }
+
     @Override
     public void completeAsync(Callback callback) {
         if (cancelled) return;
@@ -45,10 +53,12 @@ public class SQLGetTask extends SQLTask {
             if (cancelled) return;
 
             SQLEntry result = sql.get(this, table, entries, anyLabels, anyValues);
+            cached_data = result;
 
             if (asyncCallback != null) asyncCallback.call("complete", new Properties().set("result", result));
         } catch (Exception e) {
-            System.err.println("SQL Error: Failed to check in database. (" + e.getMessage() + ")");
+            System.err.println("SQL Error: Failed to get in database. (" + e.getMessage() + ")");
+            e.printStackTrace();
         }
     }
 

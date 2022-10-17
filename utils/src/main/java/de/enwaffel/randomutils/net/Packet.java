@@ -1,9 +1,9 @@
-package de.enwaffel.randomutils.nio;
+package de.enwaffel.randomutils.net;
 
-public class Packet<T> {
+public abstract class Packet<T> {
 
     private T data;
-    private PacketWriter writer;
+    private Writable writer;
 
     public Packet() {
         data = null;
@@ -27,8 +27,13 @@ public class Packet<T> {
         this.data = data;
     }
 
-    public void setWriter(PacketWriter writer) {
+    public void setWriter(Writable writer) {
         this.writer = writer;
+    }
+
+    @Override
+    public String toString() {
+        return data.toString();
     }
 
 }

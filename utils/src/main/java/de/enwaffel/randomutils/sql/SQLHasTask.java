@@ -51,6 +51,7 @@ public class SQLHasTask extends SQLTask {
             return result;
         } catch (Exception e) {
             System.err.println("SQL Error: Failed to check in database. (" + e.getMessage() + ")");
+            e.printStackTrace();
             return false;
         }
     }

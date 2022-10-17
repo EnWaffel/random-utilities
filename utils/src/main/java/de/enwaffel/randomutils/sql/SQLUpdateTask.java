@@ -27,7 +27,7 @@ public class SQLUpdateTask extends SQLTask {
     @Override
     public SQLTask complete() {
         if (cancelled) return null;
-        complete();
+        execute();
         return this;
     }
 

@@ -1,7 +1,7 @@
 package de.enwaffel.randomutils.callback;
 
-import de.enwaffel.randomutils.http.HttpResponseCode;
+import de.enwaffel.randomutils.http.HttpStatus;
 
 public interface PostResponse {
-    void call(HttpResponseCode responseCode, String responseBody);
+    void call(HttpStatus responseCode, String responseBody);
 }

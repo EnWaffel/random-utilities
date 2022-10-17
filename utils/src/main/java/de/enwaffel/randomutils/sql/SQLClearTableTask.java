@@ -3,15 +3,13 @@ package de.enwaffel.randomutils.sql;
 import de.enwaffel.randomutils.Properties;
 import de.enwaffel.randomutils.callback.Callback;
 
-public class SQLSetTask extends SQLTask {
+public class SQLClearTableTask extends SQLTask {
 
     private final String table;
-    private final SQLEntry entry;
-    
-    protected SQLSetTask(SQL sql, String table, SQLEntry entry) {
+
+    protected SQLClearTableTask(SQL sql, String table) {
         super(sql);
         this.table = table;
-        this.entry = entry;
     }
 
     @Override
@@ -43,12 +41,12 @@ public class SQLSetTask extends SQLTask {
         try {
             if (cancelled) return false;
 
-            boolean result = sql.set(this, table, entry);
+            boolean result = sql.clearTable(this, table);
 
             if (asyncCallback != null) asyncCallback.call("complete", new Properties().set("result", result));
             return result;
         } catch (Exception e) {
-            System.err.println("SQL Error: Failed to set in database. (" + e.getMessage() + ")");
+            System.err.println("SQL Error: Failed to check in database. (" + e.getMessage() + ")");
             e.printStackTrace();
             return false;
         }

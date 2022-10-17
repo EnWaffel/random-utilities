@@ -1,10 +1,10 @@
 package de.enwaffel.randomutils.sql;
 
-import java.util.HashMap;
+import java.util.*;
 
 public class SQLEntry {
 
-    private final HashMap<String, Object> entries = new HashMap<>();
+    private final LinkedHashMap<String, Object> entries = new LinkedHashMap<>();
 
     public SQLEntry set(String label, Object value) {
         entries.put(label, value);

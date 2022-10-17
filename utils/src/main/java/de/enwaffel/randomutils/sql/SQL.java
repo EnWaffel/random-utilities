@@ -1,6 +1,15 @@
 package de.enwaffel.randomutils.sql;
 
+import java.util.HashMap;
+
 public abstract class SQL implements SQLTaskBuilder {
+
+    private static final HashMap<Class<? extends SQLCodeBuilder>, SQLCodeBuilder> builders = new HashMap<>();
+    protected boolean showGeneratedCode;
+
+    static {
+        builders.put(DefaultSQLCodeBuilder.class, new DefaultSQLCodeBuilder());
+    }
 
     protected SQL() {
     }
@@ -44,24 +53,61 @@ public abstract class SQL implements SQLTaskBuilder {
      */
     protected abstract SQLEntry get(SQLTask task, String table, PullEntries entries, String[] anyLabels, Object... anyValues);
 
+    protected abstract boolean createTable(SQLTask task, String table, String[] columns, String[] extraData, SQLDataType... dataTypes);
+
+    protected abstract boolean delete(SQLTask task, String table, String label, Object value);
+
+    protected abstract boolean clearTable(SQLTask task, String table);
+
+    protected abstract boolean dropTable(SQLTask task, String table);
+
     @Override
-    public SQLSetTask newTask(String table, SQLEntry entry) {
+    public SQLSetTask newSetTask(String table, SQLEntry entry) {
         return new SQLSetTask(this, table, entry);
     }
 
     @Override
-    public SQLUpdateTask newTask(String table, SQLEntry entry, String anyLabel, Object anyValue) {
+    public SQLUpdateTask newUpdateTask(String table, SQLEntry entry, String anyLabel, Object anyValue) {
         return new SQLUpdateTask(this, table, entry, anyLabel, anyValue);
     }
 
     @Override
-    public SQLHasTask newTask(String table, String label, Object value) {
+    public SQLHasTask newHasTask(String table, String label, Object value) {
         return new SQLHasTask(this, table, label, value);
     }
 
     @Override
-    public SQLGetTask newTask(String table, PullEntries entries, String[] anyLabels, Object... anyValues) {
-        return null;
+    public SQLGetTask newGetTask(String table, PullEntries entries, String[] anyLabels, Object... anyValues) {
+        return new SQLGetTask(this, table, entries, anyLabels, anyValues);
+    }
+
+    @Override
+    public SQLCreateTableTask newCreateTableTask(String table, String[] columns, SQLDataType... dataTypes) {
+        return new SQLCreateTableTask(this, table, columns, dataTypes);
+    }
+
+    @Override
+    public SQLCreateTableTask newCreateTableTask(String table, String[] columns, String[] extraData, SQLDataType... dataTypes) {
+        return new SQLCreateTableTask(this, table, columns, extraData, dataTypes);
+    }
+
+    @Override
+    public SQLDeleteTask newDeleteTask(String table, String label, String value) {
+        return new SQLDeleteTask(this, table, label, value);
+    }
+
+    @Override
+    public SQLClearTableTask newClearTableTask(String table) {
+        return new SQLClearTableTask(this, table);
+    }
+
+    @Override
+    public SQLDropTableTask newDropTableTask(String table) {
+        return new SQLDropTableTask(this, table);
+    }
+
+    public void showGeneratedCode(boolean showGeneratedCode) {
+        this.showGeneratedCode = showGeneratedCode;
     }
 
     /**
@@ -80,6 +126,11 @@ public abstract class SQL implements SQLTaskBuilder {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Deprecated
+    public static SQLCodeBuilder getDefaultCodeBuilder() {
+        return builders.get(DefaultSQLCodeBuilder.class);
     }
 
 }

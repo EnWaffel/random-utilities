@@ -4,10 +4,7 @@ import de.enwaffel.randomutils.Condition;
 import de.enwaffel.randomutils.io.ByteBuffer;
 import org.json.JSONObject;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.nio.file.Files;
 
 /**
@@ -23,6 +20,36 @@ public class FileUtil {
             while (fis.read(buffer, 0, maxBytes) >= 0);
             fis.close();
             return new String(buffer);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
+
+    public static ByteBuffer readFileRaw(InputStream in) {
+        try {
+            ByteBuffer buffer = new ByteBuffer();
+            int b = 0;
+            while (b >= 0) {
+                b = in.read();
+                buffer.add(b);
+            }
+            return buffer;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ByteBuffer();
+        }
+    }
+
+    public static String readFile(InputStream in) {
+        try {
+            ByteBuffer buffer = new ByteBuffer();
+            int b = 0;
+            while (b >= 0) {
+                b = in.read();
+                buffer.add(b);
+            }
+            return new String(buffer.getBuffer());
         } catch (Exception e) {
             e.printStackTrace();
             return "";

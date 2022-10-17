@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 
 public class ReflectUtil {
 
-    public static List<Class<?>> findAllClassesUsingClassLoader(String packageName) {
+    public static List<Class<?>> findClasses(String packageName) {
         InputStream stream = ClassLoader.getSystemClassLoader()
                 .getResourceAsStream(packageName.replaceAll("[.]", "/"));
         assert stream != null;
@@ -27,6 +27,14 @@ public class ReflectUtil {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static Class<?> findClass(String name) {
+        try {
+            return Class.forName(name);
+        } catch (Exception e) {
+            return ReflectUtil.class;
+        }
     }
 
 }

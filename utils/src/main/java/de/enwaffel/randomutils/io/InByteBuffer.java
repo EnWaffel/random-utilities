@@ -32,11 +32,11 @@ public class InByteBuffer extends ByteBuffer {
             while (b > 0) {
                 b = is.read();
                 if (b == 0x01) {
-                    if (ByteUtil.byteToSingleDigit(next()) == 0) {
+                    if (ByteUtil.byteToDigit(next()) == 0) {
                         byte n = next();
                         StringBuilder tempLen = new StringBuilder();
                         while (n != 0x02) {
-                            tempLen.append(ByteUtil.byteToSingleDigit(n));
+                            tempLen.append(ByteUtil.byteToDigit(n));
                             n = next();
                         }
                         len = Integer.parseInt(tempLen.toString());

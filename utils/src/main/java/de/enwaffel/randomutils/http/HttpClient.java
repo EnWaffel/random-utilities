@@ -1,23 +1,11 @@
 package de.enwaffel.randomutils.http;
 
-import de.enwaffel.randomutils.Properties;
-import de.enwaffel.randomutils.Property;
-import de.enwaffel.randomutils.callback.PostResponse;
-import org.json.JSONObject;
-
-import java.net.URI;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.CompletableFuture;
-
 /**
  * A simpler version of the java HttpClient.
  */
 public class HttpClient {
 
+    /*
     private final java.net.http.HttpClient client;
     private Timer timer;
 
@@ -90,6 +78,7 @@ public class HttpClient {
      *
      * @return a new HttpClient
      */
+    /*
     public static HttpClient get() {
         return new HttpClient(java.net.http.HttpClient.newHttpClient());
     }
@@ -99,6 +88,7 @@ public class HttpClient {
      * @param properties accepts: {{@code authenticator}: {@linkplain java.net.Authenticator}, {@code redirect_policy}: {@linkplain java.net.http.HttpClient.Redirect}, {@code connect_timeout}: {@linkplain java.time.Duration}, {@code cookie_handler}: {@linkplain java.net.CookieHandler}, {@code executor}: {@linkplain java.net.Authenticator}, {@code priority}: {@linkplain java.lang.Integer}, {@code proxy}: {@linkplain java.net.ProxySelector}, {@code ssl_context}: {@linkplain javax.net.ssl.SSLContext}, {@code ssl_parameters}: {@linkplain javax.net.ssl.SSLParameters}, {@code version}: {@linkplain java.net.http.HttpClient.Version}}
      * @return a new HttpClient
      */
+    /*
     public static HttpClient get(Properties properties) {
         java.net.http.HttpClient.Builder builder = java.net.http.HttpClient.newBuilder();
         if (properties.has("authenticator")) builder.authenticator(properties.get("authenticator").any());
@@ -114,4 +104,5 @@ public class HttpClient {
         return new HttpClient(builder.build());
     }
 
+     */
 }

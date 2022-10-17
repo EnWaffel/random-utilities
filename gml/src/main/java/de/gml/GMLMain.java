@@ -2,6 +2,7 @@ package de.gml;
 
 import de.enwaffel.randomutils.Properties;
 import de.enwaffel.randomutils.file.FileOrPath;
+import de.enwaffel.randomutils.file.FileUtil;
 import org.luaj.vm2.Globals;
 import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
@@ -10,8 +11,15 @@ import org.luaj.vm2.lib.OneArgFunction;
 import org.luaj.vm2.lib.VarArgFunction;
 import org.luaj.vm2.lib.ZeroArgFunction;
 import org.luaj.vm2.lib.jse.JsePlatform;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
+import javax.xml.XMLConstants;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 
 /**
  * USE THIS CLASS ONLY FOR LUA PROJECTS!!!!!!!
@@ -32,28 +40,45 @@ public class GMLMain {
         switch (args[0]) {
             case "test": {
                 p.set("command", "test");
-
+                loadProjectFile();
                 run();
             }
             case "build": {
                 p.set("command", "build");
-
+                loadProjectFile();
                 compile();
             }
             default: {
-                ERR("GML Error: Usage: <test, build>");
-                System.exit(-1);
+                System.out.println(args[0]);
+                //ERR("GML Error: Usage: <test, build>");
+                //System.exit(-1);
             }
         }
     }
 
     protected static void run() {
         g.set("GML", new LL.LL_GML());
-        g.loadfile("gml_lua_program/main.lua").call();
     }
 
     protected static void compile() {
 
+    }
+
+    protected static void loadProjectFile() {
+        try {
+            String workingDirectory = Paths.get("").toAbsolutePath().toString();
+
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING,true);
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document doc = builder.parse(new File(workingDirectory + "/project.xml"));
+            doc.normalize();
+            Element root = doc.getDocumentElement();
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     protected static LuaValue ERR(String err) {
