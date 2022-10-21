@@ -1,5 +1,6 @@
 package de.enwaffel.randomutils.sql;
 
+import java.sql.SQLException;
 import java.util.HashMap;
 
 public abstract class SQL implements SQLTaskBuilder {
@@ -20,7 +21,7 @@ public abstract class SQL implements SQLTaskBuilder {
      * @param entry The actual data.
      * @return {@code true} if succeeded, {@code false} if not.
      */
-    protected abstract boolean set(SQLTask task, String table, SQLEntry entry);
+    protected abstract boolean set(SQLTask task, String table, SQLEntry entry) throws SQLException;
 
     /**
      * Goes through every entry in {@code table} and checks if {@code anyLabel} with {@code anyValue} is present within the entry.
@@ -31,7 +32,7 @@ public abstract class SQL implements SQLTaskBuilder {
      * @param anyValue The data the checked labels should have.
      * @return {@code true} if succeeded, {@code false} if not.
      */
-    protected abstract boolean update(SQLTask task, String table, SQLEntry entry, String anyLabel, Object anyValue);
+    protected abstract boolean update(SQLTask task, String table, SQLEntry entry, String anyLabel, Object anyValue) throws SQLException;
 
     /**
      * Checks if {@code label} with the data {@code value} is present.
@@ -40,7 +41,7 @@ public abstract class SQL implements SQLTaskBuilder {
      * @param value The value the checked label should have.
      * @return {@code true} if the label with the same data is present, {@code false} if not.
      */
-    protected abstract boolean has(SQLTask task, String table, String label, Object value);
+    protected abstract boolean has(SQLTask task, String table, String label, Object value) throws SQLException;
 
     /**
      * Goes through every entry in {@code table} and checks if {@code anyLabels} with {@code anyValues} are present within the entry.
@@ -51,15 +52,15 @@ public abstract class SQL implements SQLTaskBuilder {
      * @param anyValues The data the checked labels should have.
      * @return The retrieved data.
      */
-    protected abstract SQLEntry get(SQLTask task, String table, PullEntries entries, String[] anyLabels, Object... anyValues);
+    protected abstract SQLEntry get(SQLTask task, String table, PullEntries entries, String[] anyLabels, Object... anyValues) throws SQLException;
 
-    protected abstract boolean createTable(SQLTask task, String table, String[] columns, String[] extraData, SQLDataType... dataTypes);
+    protected abstract boolean createTable(SQLTask task, String table, String[] columns, String[] extraData, SQLDataType... dataTypes) throws SQLException;
 
-    protected abstract boolean delete(SQLTask task, String table, String label, Object value);
+    protected abstract boolean delete(SQLTask task, String table, String label, Object value) throws SQLException;
 
-    protected abstract boolean clearTable(SQLTask task, String table);
+    protected abstract boolean clearTable(SQLTask task, String table) throws SQLException;
 
-    protected abstract boolean dropTable(SQLTask task, String table);
+    protected abstract boolean dropTable(SQLTask task, String table) throws SQLException;
 
     @Override
     public SQLSetTask newSetTask(String table, SQLEntry entry) {

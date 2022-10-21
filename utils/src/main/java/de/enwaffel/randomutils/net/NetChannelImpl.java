@@ -5,9 +5,6 @@ import de.enwaffel.randomutils.io.ByteBuffer;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 class NetChannelImpl extends NetChannel {
 
@@ -74,6 +71,11 @@ class NetChannelImpl extends NetChannel {
     @Override
     public void listen(ChannelInputListener listener) {
         listeners = ArrayUtils.add(listeners, listener);
+    }
+
+    @Override
+    public void unlisten(ChannelInputListener listener) {
+        listeners = ArrayUtils.removeElement(listeners, listener);
     }
 
     @Override

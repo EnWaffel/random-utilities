@@ -58,6 +58,17 @@ public class NetServer extends ChannelHolder {
         }
     }
 
+    public void stop() {
+        try {
+            if (serverSocket != null && !serverSocket.isClosed()) {
+                serverSocket.close();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Failed to stop server.");
+        }
+    }
+
     private void init() {
         outputProvider = new OutputProvider() {
             @Override

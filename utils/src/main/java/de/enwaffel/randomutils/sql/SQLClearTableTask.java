@@ -46,7 +46,7 @@ public class SQLClearTableTask extends SQLTask {
             if (asyncCallback != null) asyncCallback.call("complete", new Properties().set("result", result));
             return result;
         } catch (Exception e) {
-            System.err.println("SQL Error: Failed to check in database. (" + e.getMessage() + ")");
+            System.err.println("SQL Error: Failed to clear table in database. (" + e.getMessage() + ")");
             e.printStackTrace();
             return false;
         }

@@ -34,6 +34,17 @@ public class NetClient extends ChannelHolder {
         }
     }
 
+    public void disconnect() {
+        try {
+            if (socket != null && !socket.isClosed()) {
+                socket.close();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Failed to stop client.");
+        }
+    }
+
     private void init() {
         outputProvider = new OutputProvider() {
             @Override

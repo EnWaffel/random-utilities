@@ -43,6 +43,7 @@ public class FileOrPath {
     public static FileOrPath search(FileOrPath folder, String name) {
         scannedFolders = 0;
         foundFiles = 0;
+        System.out.println(folder.getFile());
         return FileOrPath.path(findPath(folder.getFile(), name));
     }
 

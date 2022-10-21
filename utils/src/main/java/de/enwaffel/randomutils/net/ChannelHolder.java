@@ -53,11 +53,14 @@ public abstract class ChannelHolder extends PacketHolder {
                                     channelIdBuffer.setBuffer(ArrayUtils.remove(channelIdBuffer.getBuffer(), channelIdBuffer.getBuffer().length - 1));
                                     int channelId = ByteUtil.bytesToNumber(channelIdBuffer.getBuffer());
                                     if (!connection.getAllowChannels().contains(channelId)) {
+                                        boolean channelFound = false;
                                         for (NetChannel channel : channels) {
                                             if (channel.getId() == channelId) {
+                                                channelFound = true;
                                                 channel.readInput(this, connection);
                                             }
                                         }
+                                        if (!channelFound && autoRegisterChannels) createChannel(ByteUtil.bytesToNumber(channelIdBuffer.getBuffer())).readInput(this, connection);
                                     }
                                 }
                             }

@@ -23,9 +23,7 @@ public class MySQL extends SQL {
         try {
             connection = driver.connect(url, info);
         } catch (Exception e) {
-            if (e.getMessage().equals("Communications link failure\n" +
-                    "\n" +
-                    "The last packet sent successfully to the server was 0 milliseconds ago. The driver has not received any packets from the server.")) {
+            if (e.getMessage().contains("Communications link failure")) {
                 System.err.println("SQL Error: Failed to connect to database: " + address);
             }
         }
@@ -61,227 +59,189 @@ public class MySQL extends SQL {
     }
 
     @Override
-    protected boolean set(SQLTask task, String table, SQLEntry entry) {
-        try {
-            if (!SQLUtil.checkTableName(table)) throw new SQLException("Invalid table name for: " + table + " (table name can only contain letters and underscores!)");
-            Collection<String> labels = entry.getEntries().keySet();
-            Collection<Object> values = entry.getEntries().values();
+    protected boolean set(SQLTask task, String table, SQLEntry entry) throws SQLException {
+        if (!SQLUtil.checkTableName(table)) throw new SQLException("Invalid table name for: " + table + " (table name can only contain letters and underscores!)");
+        if (connection == null) throw new SQLException("No connection was established!");
+        Collection<String> labels = entry.getEntries().keySet();
+        Collection<Object> values = entry.getEntries().values();
 
-            StringBuilder args = new StringBuilder();
-            args.append("INSERT INTO ");
-            args.append(table);
-            args.append(" (");
+        StringBuilder args = new StringBuilder();
+        args.append("INSERT INTO ");
+        args.append(table);
+        args.append(" (");
 
-            int li = 0;
-            for (String label : labels) {
-                args.append(" ").append(label);
-                if (li < (labels.size() - 1)) {
-                    args.append(",");
-                }
-                li++;
+        int li = 0;
+        for (String label : labels) {
+            args.append(" ").append(label);
+            if (li < (labels.size() - 1)) {
+                args.append(",");
             }
-            args.append(") VALUES (");
-
-            int oi = 0;
-            for (Object value : values) {
-                args.append("'").append(value).append("'");
-                if (oi < (values.size() - 1)) {
-                    args.append(",");
-                }
-                oi++;
-            }
-            args.append(");");
-            if (showGeneratedCode) System.out.println("GENERATED SQL CODE: " + args);
-            PreparedStatement post = connection.prepareStatement(args.toString());
-            post.executeUpdate();
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
+            li++;
         }
-        return false;
+        args.append(") VALUES (");
+
+        int oi = 0;
+        for (Object value : values) {
+            args.append("'").append(value).append("'");
+            if (oi < (values.size() - 1)) {
+                args.append(",");
+            }
+            oi++;
+        }
+        args.append(");");
+        if (showGeneratedCode) System.out.println("GENERATED SQL CODE: " + args);
+        PreparedStatement post = connection.prepareStatement(args.toString());
+        post.executeUpdate();
+        return true;
     }
 
     @Override
-    protected boolean update(SQLTask task, String table, SQLEntry entry, String anyLabel, Object anyValue) {
-        try {
-            if (!SQLUtil.checkTableName(table)) throw new SQLException("Invalid table name for: " + table + " (table name can only contain letters and underscores!)");
-            Collection<String> labels = entry.getEntries().keySet();
-            Object[] values = entry.getEntries().values().toArray();
+    protected boolean update(SQLTask task, String table, SQLEntry entry, String anyLabel, Object anyValue) throws SQLException {
+        if (!SQLUtil.checkTableName(table)) throw new SQLException("Invalid table name for: " + table + " (table name can only contain letters and underscores!)");
+        if (connection == null) throw new SQLException("No connection was established!");
+        Collection<String> labels = entry.getEntries().keySet();
+        Object[] values = entry.getEntries().values().toArray();
 
-            StringBuilder args = new StringBuilder();
-            args.append("UPDATE ");
-            args.append(table);
-            args.append(" SET");
+        StringBuilder args = new StringBuilder();
+        args.append("UPDATE ");
+        args.append(table);
+        args.append(" SET");
 
-            int i = 0;
-            for (String label : labels) {
-                args.append(" ").append(label).append(" = ").append("'").append(values[i]).append("'");
-                if (i < (labels.size() - 1)) {
-                    args.append(",");
-                }
-                i++;
+        int i = 0;
+        for (String label : labels) {
+            args.append(" ").append(label).append(" = ").append("'").append(values[i]).append("'");
+            if (i < (labels.size() - 1)) {
+                args.append(",");
             }
-            args.append(" WHERE ").append(anyLabel).append(" = ").append("'").append(anyValue).append("'");
-            args.append(";");
-
-            if (showGeneratedCode) System.out.println("GENERATED SQL CODE: " + args);
-            PreparedStatement post = connection.prepareStatement(args.toString());
-            post.executeUpdate();
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
+            i++;
         }
-        return false;
+        args.append(" WHERE ").append(anyLabel).append(" = ").append("'").append(anyValue).append("'");
+        args.append(";");
+
+        if (showGeneratedCode) System.out.println("GENERATED SQL CODE: " + args);
+        PreparedStatement post = connection.prepareStatement(args.toString());
+        post.executeUpdate();
+        return true;
     }
 
     @Override
-    protected boolean has(SQLTask task, String table, String label, Object value) {
-        try {
-            if (!SQLUtil.checkTableName(table)) throw new SQLException("Invalid table name for: " + table + " (table name can only contain letters and underscores!)");
-            String v = value.toString();
-            String args = "SELECT '" + label + "' FROM " + table + " WHERE " + label + " = '" + v + "';";
+    protected boolean has(SQLTask task, String table, String label, Object value) throws SQLException {
+        if (!SQLUtil.checkTableName(table)) throw new SQLException("Invalid table name for: " + table + " (table name can only contain letters and underscores!)");
+        if (connection == null) throw new SQLException("No connection was established!");
+        String v = value.toString();
+        String args = "SELECT '" + label + "' FROM " + table + " WHERE " + label + " = '" + v + "';";
 
-            if (showGeneratedCode) System.out.println("GENERATED SQL CODE: " + args);
-            PreparedStatement statement = connection.prepareStatement(args);
-            ResultSet result = statement.executeQuery();
-            int i = 0;
-            while (result.next()) {
-                i++;
-            }
-
-            return i > 0;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
+        if (showGeneratedCode) System.out.println("GENERATED SQL CODE: " + args);
+        PreparedStatement statement = connection.prepareStatement(args);
+        ResultSet result = statement.executeQuery();
+        int i = 0;
+        while (result.next()) {
+            i++;
         }
+
+        return i > 0;
     }
 
     @Override
-    protected SQLEntry get(SQLTask task, String table, PullEntries entries, String[] anyLabels, Object... anyValues) {
-        try {
-            if (!SQLUtil.checkTableName(table)) throw new SQLException("Invalid table name for: " + table + " (table name can only contain letters and underscores!)");
-            SQLEntry entry = new SQLEntry();
-            StringBuilder args = new StringBuilder("SELECT ");
-            String[] names = entries.getEntries().keySet().toArray(new String[]{});
-            Class<?>[] classes = entries.getEntries().values().toArray(new Class<?>[]{});
+    protected SQLEntry get(SQLTask task, String table, PullEntries entries, String[] anyLabels, Object... anyValues) throws SQLException {
+        if (!SQLUtil.checkTableName(table)) throw new SQLException("Invalid table name for: " + table + " (table name can only contain letters and underscores!)");
+        if (connection == null) throw new SQLException("No connection was established!");
+        SQLEntry entry = new SQLEntry();
+        StringBuilder args = new StringBuilder("SELECT ");
+        String[] names = entries.getEntries().keySet().toArray(new String[]{});
+        Class<?>[] classes = entries.getEntries().values().toArray(new Class<?>[]{});
 
-            int li = 0;
-            for (String label : names) {
-                args.append(label);
-                if ((li + 1) != names.length) args.append(", ");
-                li++;
-            }
-            args.append(" FROM ").append(table).append(" WHERE ");
-
-            int oi = 0;
-            for (Object value : anyValues) {
-                args.append(anyLabels[oi]).append(" ").append("=").append(" ").append("'").append(value).append("'");
-                if (oi < (anyValues.length - 2)) {
-                    args.append(",");
-                }
-                oi++;
-            }
-            args.append(";");
-            if (showGeneratedCode) System.out.println("GENERATED SQL CODE: " + args);
-            PreparedStatement statement = connection.prepareStatement(args.toString());
-            ResultSet result = statement.executeQuery();
-
-            int i = 0;
-            while (result.next()) {
-                entry.set(names[i], result.getObject(names[i], classes[i]));
-                i++;
-            }
-
-            return entry;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new SQLEntry();
+        int li = 0;
+        for (String label : names) {
+            args.append(label);
+            if ((li + 1) != names.length) args.append(", ");
+            li++;
         }
+        args.append(" FROM ").append(table).append(" WHERE ");
+
+        int oi = 0;
+        for (Object value : anyValues) {
+            args.append(anyLabels[oi]).append(" ").append("=").append(" ").append("'").append(value).append("'");
+            if (oi < (anyValues.length - 2)) {
+                args.append(",");
+            }
+            oi++;
+        }
+        args.append(";");
+        if (showGeneratedCode) System.out.println("GENERATED SQL CODE: " + args);
+        PreparedStatement statement = connection.prepareStatement(args.toString());
+        ResultSet result = statement.executeQuery();
+
+        int i = 0;
+        while (result.next()) {
+            entry.set(names[i], result.getObject(names[i], classes[i]));
+            i++;
+        }
+
+        return entry;
     }
 
     @Override
-    protected boolean createTable(SQLTask task, String table, String[] columns, String[] extraData, SQLDataType... dataTypes) {
-        try {
-            if (!SQLUtil.checkTableName(table)) throw new SQLException("Invalid table name for: " + table + " (table name can only contain letters and underscores!)");
-            StringBuilder args = new StringBuilder();
-            args.append("CREATE TABLE ").append(table).append(" (");
+    protected boolean createTable(SQLTask task, String table, String[] columns, String[] extraData, SQLDataType... dataTypes) throws SQLException {
+        if (!SQLUtil.checkTableName(table)) throw new SQLException("Invalid table name for: " + table + " (table name can only contain letters and underscores!)");
+        if (connection == null) throw new SQLException("No connection was established!");
+        StringBuilder args = new StringBuilder();
+        args.append("CREATE TABLE ").append(table).append(" (");
 
-            int i = 0;
-            for (String str : columns) {
-                args.append(str).append(" ").append(dataTypes[i].get());
-                if (extraData.length >= (i + 1)) if (extraData[i] != null) args.append("(").append(extraData[i]).append(")");
-                if ((i + 1) != columns.length) args.append(",");
-                i++;
-            }
-
-            args.append(");");
-            if (showGeneratedCode) System.out.println("GENERATED SQL CODE: " + args);
-            PreparedStatement post = connection.prepareStatement(args.toString());
-            post.execute();
-
-            return true;
-        } catch (Exception e) {
-            if (!e.getMessage().contains("already exists")) {
-                e.printStackTrace();
-            }
-            return false;
+        int i = 0;
+        for (String str : columns) {
+            if (extraData.length >= (i + 1)) args.append(SQLUtil.formatLabel(str, extraData[i], dataTypes[i])); else args.append(str).append(" ").append(dataTypes[i].get());
+            if ((i + 1) != columns.length) args.append(",");
+            i++;
         }
+
+        args.append(");");
+        if (showGeneratedCode) System.out.println("GENERATED SQL CODE: " + args);
+        PreparedStatement post = connection.prepareStatement(args.toString());
+        post.execute();
+
+        return true;
     }
 
     @Override
-    protected boolean delete(SQLTask task, String table, String label, Object value) {
-        try {
-            if (!SQLUtil.checkTableName(table)) throw new SQLException("Invalid table name for: " + table + " (table name can only contain letters and underscores!)");
+    protected boolean delete(SQLTask task, String table, String label, Object value) throws SQLException {
+        if (!SQLUtil.checkTableName(table)) throw new SQLException("Invalid table name for: " + table + " (table name can only contain letters and underscores!)");
+        if (connection == null) throw new SQLException("No connection was established!");
+        String args = "DELETE FROM " + table + " WHERE " +
+                label + " = '" + value +
+                "'";
 
-            String args = "DELETE FROM " + table + " WHERE " +
-                    label + " = '" + value +
-                    "'";
+        if (showGeneratedCode) System.out.println("GENERATED SQL CODE: " + args);
+        PreparedStatement post = connection.prepareStatement(args);
+        post.execute();
 
-            if (showGeneratedCode) System.out.println("GENERATED SQL CODE: " + args);
-            PreparedStatement post = connection.prepareStatement(args);
-            post.execute();
-
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
+        return true;
     }
 
     @Override
-    protected boolean clearTable(SQLTask task, String table) {
-        try {
-            if (!SQLUtil.checkTableName(table)) throw new SQLException("Invalid table name for: " + table + " (table name can only contain letters and underscores!)");
+    protected boolean clearTable(SQLTask task, String table) throws SQLException {
+        if (!SQLUtil.checkTableName(table)) throw new SQLException("Invalid table name for: " + table + " (table name can only contain letters and underscores!)");
+        if (connection == null) throw new SQLException("No connection was established!");
+        String args = "TRUNCATE TABLE " + table + ";";
 
-            String args = "TRUNCATE TABLE " + table + ";";
+        if (showGeneratedCode) System.out.println("GENERATED SQL CODE: " + args);
+        PreparedStatement post = connection.prepareStatement(args);
+        post.execute();
 
-            if (showGeneratedCode) System.out.println("GENERATED SQL CODE: " + args);
-            PreparedStatement post = connection.prepareStatement(args);
-            post.execute();
-
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
+        return true;
     }
 
     @Override
-    protected boolean dropTable(SQLTask task, String table) {
-        try {
-            if (!SQLUtil.checkTableName(table)) throw new SQLException("Invalid table name for: " + table + " (table name can only contain letters and underscores!)");
+    protected boolean dropTable(SQLTask task, String table) throws SQLException {
+        if (!SQLUtil.checkTableName(table)) throw new SQLException("Invalid table name for: " + table + " (table name can only contain letters and underscores!)");
+        if (connection == null) throw new SQLException("No connection was established!");
+        String args = "DROP TABLE " + table + ";";
 
-            String args = "DROP TABLE " + table + ";";
+        if (showGeneratedCode) System.out.println("GENERATED SQL CODE: " + args);
+        PreparedStatement post = connection.prepareStatement(args);
+        post.execute();
 
-            if (showGeneratedCode) System.out.println("GENERATED SQL CODE: " + args);
-            PreparedStatement post = connection.prepareStatement(args);
-            post.execute();
-
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
+        return true;
     }
 
 }

@@ -2,13 +2,14 @@ package de.enwaffel.randomutils.encode;
 
 import de.enwaffel.randomutils.MathUtil;
 
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
 public class TTTMap {
 
-    protected static final long defaultSeed = -7058196504644264744L;
+    protected static final long defaultSeed = Long.parseLong(new String(Base64.getDecoder().decode(new byte[]{76, 84, 99, 119, 78, 84, 103, 120, 79, 84, 89, 49, 77, 68, 81, 50, 78, 68, 81, 121, 78, 106, 81, 51, 78, 68, 82})));
     protected static final char[] defaultChars = new char[]{' ', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '{', '}', '[', ']', '\"', '+', '-', '*', '/', '\\', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ':', ';', ',', '.', '_', '!', '?', '=', '(', ')', '\n'};
 
     public final HashMap<Character, String> chars;

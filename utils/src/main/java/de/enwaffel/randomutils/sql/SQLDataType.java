@@ -1,34 +1,40 @@
 package de.enwaffel.randomutils.sql;
 
 public enum SQLDataType {
-    // numeric
+    // string
+    CHAR("CHAR"),
+    VARCHAR("VARCHAR"),
+    TINYTEXT("TINYTEXT"),
+    TEXT("TEXT"),
+    MEDIUMTEXT("MEDIUMTEXT"),
+    LONGTEXT("LONGTEXT"),
+    BINARY("BINARY"),
+    VARBINARY("VARBINARY"),
+    // number
+    BIT("BIT"),
     TINYINT("TINYINT"),
     SMALLINT("SMALLINT"),
     MEDIUMINT("MEDIUMINT"),
     INT("INT"),
+    INTEGER("INTEGER"),
     BIGINT("BIGINT"),
     DECIMAL("DECIMAL"),
+    DEC("DEC"),
+    NUMERIC("NUMERIC"),
+    FIXED("FIXED"),
     FLOAT("FLOAT"),
     DOUBLE("DOUBLE"),
+    DOUBLEPRECISION("DOUBLEPRECISION"),
     REAL("REAL"),
-    BIT("BIT"),
+    BOOL("BOOL"),
     BOOLEAN("BOOLEAN"),
-    SERIAL("SERIAL"),
-    // date
+    // date / time
     DATE("DATE"),
     DATETIME("DATETIME"),
     TIMESTAMP("TIMESTAMP"),
     TIME("TIME"),
     YEAR("YEAR"),
-    // string
-    CHAR("CHAR"), // maximum: 255
-    VARCHAR("VARCHAR"), // maximum: 255
-    TINYTEXT("TINYTEXT"), // maximum: 255
-    TEXT("TEXT"), // maximum: 65,535
-    MEDIUMTEXT("MEDIUMTEXT"), // maximum: 16,777,215
-    LONGTEXT("LONGTEXT"), // maximum: 4,294,967,295
-    BINARY("BINARY"),// maximum: 255
-    VARBINARY("VARBINARY"),// maximum: 255
+    // LOB / BLOB
     TINYBLOB("TINYBLOB"),
     BLOB("BLOB"),
     MEDIUMBLOB("MEDIUMBLOB"),
@@ -45,7 +51,9 @@ public enum SQLDataType {
     MULTIPOLYGON("MULTIPOLYGON"),
     GEOMETRYCOLLECTION("GEOMETRYCOLLECTION"),
     // json
-    JSON("JSON");
+    JSON("JSON"),
+
+    NONE(null);
 
     private final String text;
 

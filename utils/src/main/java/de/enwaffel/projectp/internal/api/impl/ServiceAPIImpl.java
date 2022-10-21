@@ -5,6 +5,9 @@ import de.enwaffel.projectp.api.service.ServiceAPI;
 import okhttp3.OkHttpClient;
 import org.apache.commons.lang3.Validate;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public class ServiceAPIImpl implements ServiceAPI {
 
     private static boolean initialized;
@@ -16,6 +19,7 @@ public class ServiceAPIImpl implements ServiceAPI {
     public ServiceAPIImpl() {
         Validate.isTrue(!initialized, "already initialized!");
 
+        Logger.getLogger(OkHttpClient.class.getName()).setLevel(Level.FINE);
         assetProvider = new AssetProviderImpl(this);
         httpClient = new OkHttpClient();
 

@@ -10,7 +10,7 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 import org.json.JSONObject;
 
-public class AssetProviderImpl implements AssetProvider {
+class AssetProviderImpl implements AssetProvider {
 
     private static final MediaType JSON = MediaType.get("application/json");
 
@@ -31,8 +31,8 @@ public class AssetProviderImpl implements AssetProvider {
                     .post(body)
                     .build();
             Response response = serviceAPI.getHttpClient().newCall(request).execute();
-            if (response.body() == null) return ByteBuffer.from("Failed to get asset: " + name);
-            if (response.code() == HttpStatus.NOT_FOUND.code()) return ByteBuffer.from("Failed to get asset: " + name);
+            if (response.body() == null) { response.close(); return ByteBuffer.from("Failed to get asset: " + name + " (response body null)"); }
+            if (response.code() == HttpStatus.NOT_FOUND.code()) { response.close(); return ByteBuffer.from("Failed to get asset: " + name + " (not found)"); }
             return new ByteBuffer(response.body().bytes());
         } catch (Exception e) {
             e.printStackTrace();

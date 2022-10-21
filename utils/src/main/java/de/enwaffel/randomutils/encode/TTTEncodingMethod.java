@@ -1,5 +1,9 @@
 package de.enwaffel.randomutils.encode;
 
+import org.apache.commons.lang3.ArrayUtils;
+
+import java.util.Base64;
+
 public class TTTEncodingMethod implements EncodingMethod {
 
     private final String defaultSeparator = "-";
@@ -146,6 +150,22 @@ public class TTTEncodingMethod implements EncodingMethod {
             result = from(result);
         }
         return result;
+    }
+
+
+    @Override
+    public byte[] encode(String str) {
+        byte[] result = new byte[0];
+        for (char c : str.toCharArray()) {
+            byte b = (byte) c;
+            result = ArrayUtils.add(result, (byte) (b << 10));
+        }
+        return result;
+    }
+
+    @Override
+    public String decode(byte[] bytes) {
+        return null;
     }
 
     @Override
